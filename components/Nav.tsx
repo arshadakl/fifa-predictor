@@ -25,6 +25,12 @@ export default function Nav() {
           >
             Home
           </Link>
+          <Link
+            href="/teams"
+            className="font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase text-white/55 no-underline pb-1 transition-colors hover:text-white"
+          >
+            Teams
+          </Link>
           <a
             href="#"
             className="font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase text-white/55 no-underline pb-1 transition-colors hover:text-white"
