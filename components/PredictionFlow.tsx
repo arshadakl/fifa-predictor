@@ -10,7 +10,7 @@ import WarningModal from './WarningModal';
 import RegistrationStep, { type RegistrationValues } from './steps/RegistrationStep';
 import PredictionWizard from './steps/PredictionWizard';
 import ThankYouStep from './steps/ThankYouStep';
-import type { Predictions } from '@/lib/fields';
+import { PREDICTION_FIELDS, type Predictions } from '@/lib/fields';
 
 type FormData = RegistrationValues & Predictions;
 
@@ -41,6 +41,8 @@ type StoredProgress = {
 
 const INITIAL_PROGRESS: StoredProgress = { currentStep: 1, formData: EMPTY_FORM_DATA, questionIndex: 0 };
 
+const MAX_QUESTION_INDEX = PREDICTION_FIELDS.length - 1;
+
 function loadStoredProgress(): StoredProgress {
   if (typeof window === 'undefined') return INITIAL_PROGRESS;
   try {
@@ -48,10 +50,18 @@ function loadStoredProgress(): StoredProgress {
     if (!stored) return INITIAL_PROGRESS;
     const parsed = JSON.parse(stored);
     const currentStep = typeof parsed.currentStep === 'number' ? parsed.currentStep : 1;
+
+    // Step 3 (thank-you) is never persisted by current code, but older
+    // sessions could still have it stored - treat as a completed,
+    // non-resumable run rather than rendering a blank wizard.
+    if (currentStep >= 3) return INITIAL_PROGRESS;
+
+    const questionIndex = typeof parsed.questionIndex === 'number' ? parsed.questionIndex : 0;
+
     return {
-      currentStep: Math.min(Math.max(currentStep, 1), 3),
+      currentStep: Math.min(Math.max(currentStep, 1), 2),
       formData: { ...EMPTY_FORM_DATA, ...parsed.formData },
-      questionIndex: typeof parsed.questionIndex === 'number' ? parsed.questionIndex : 0,
+      questionIndex: Math.min(Math.max(questionIndex, 0), MAX_QUESTION_INDEX),
     };
   } catch (err) {
     console.error(err);
@@ -143,11 +153,7 @@ export default function PredictionFlow() {
         {submitted && (
           <ThankYouStep
             submissionId={submissionId}
-            onReturnHome={() => {
-              setSubmissionId('');
-              setSubmitted(false);
-              router.push('/');
-            }}
+            onReturnHome={() => router.push('/')}
           />
         )}
       </main>

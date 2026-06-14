@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Spinner from '../Spinner';
 import OptionSelector from '../OptionSelector';
 import { btnPrimary, btnSecondary, btnGold } from '../buttonStyles';
@@ -48,6 +48,7 @@ export default function PredictionWizard({
 }) {
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   const field = WIZARD_FIELDS[questionIndex];
   const category = field.category;
@@ -82,6 +83,8 @@ export default function PredictionWizard({
       return;
     }
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     try {
       const response = await fetch('/api/predict', {
@@ -106,6 +109,7 @@ export default function PredictionWizard({
       console.error('Submission failed:', err);
       onWarning('Unable to connect to the server. Please check your connection and try again.');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -141,6 +145,7 @@ export default function PredictionWizard({
         </h2>
 
         <OptionSelector
+          key={field.key}
           options={category === 0 ? TEAM_OPTIONS : PLAYER_OPTIONS}
           kind={category === 0 ? 'team' : 'player'}
           value={value}
@@ -154,7 +159,7 @@ export default function PredictionWizard({
         )}
 
         <div className="flex justify-between w-full mt-10 gap-4">
-          <button onClick={handleBack} className={`${btnSecondary} flex-1`}>
+          <button onClick={handleBack} disabled={submitting} className={`${btnSecondary} flex-1`}>
             Back
           </button>
           <button

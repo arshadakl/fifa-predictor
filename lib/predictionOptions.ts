@@ -25,7 +25,7 @@ export const TEAM_OPTIONS: TeamOption[] = teamsData.teams.map((t) => ({
   stage: t.stage,
 }));
 
-export const PLAYER_OPTIONS: PlayerOption[] = Object.values(squadsData).flatMap((squad) =>
+const RAW_PLAYER_OPTIONS = Object.values(squadsData).flatMap((squad) =>
   squad.players.map((p) => ({
     id: `${squad.idTeam}-${p.idPlayer}`,
     name: p.name,
@@ -34,4 +34,20 @@ export const PLAYER_OPTIONS: PlayerOption[] = Object.values(squadsData).flatMap(
     imageSrc: p.pictureUrl ? playerImageUrl(p.pictureUrl, 250) : null,
     position: p.position,
   })),
-).sort((a, b) => a.name.localeCompare(b.name));
+);
+
+// Some players share an identical name across different squads (e.g. "Emiliano
+// Martinez" plays for both Argentina and Uruguay). Suffix the team name for
+// those so the option list, selection highlight, and stored answer stay
+// unambiguous - otherwise both rows would match `value` and `.find()` could
+// resolve to the wrong player's flag/photo in the preview box.
+const NAME_COUNTS = new Map<string, number>();
+for (const p of RAW_PLAYER_OPTIONS) {
+  const key = p.name.toLowerCase();
+  NAME_COUNTS.set(key, (NAME_COUNTS.get(key) ?? 0) + 1);
+}
+
+export const PLAYER_OPTIONS: PlayerOption[] = RAW_PLAYER_OPTIONS.map((p) => ({
+  ...p,
+  name: (NAME_COUNTS.get(p.name.toLowerCase()) ?? 0) > 1 ? `${p.name} (${p.teamName})` : p.name,
+})).sort((a, b) => a.name.localeCompare(b.name));
