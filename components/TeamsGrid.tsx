@@ -8,8 +8,9 @@ import SearchInput from './SearchInput';
 export default function TeamsGrid({ teams }: { teams: Team[] }) {
   const [query, setQuery] = useState('');
 
+  const q = query.trim().toLowerCase();
   const filtered = teams.filter((team) =>
-    team.teamName.toLowerCase().startsWith(query.trim().toLowerCase()),
+    team.teamName.toLowerCase().split(/\s+/).some((word) => word.startsWith(q)),
   );
 
   return (

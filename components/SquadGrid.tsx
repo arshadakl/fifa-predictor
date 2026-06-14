@@ -18,9 +18,12 @@ export default function SquadGrid({
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
 
-  const filteredPlayers = players.filter((player) => player.name.toLowerCase().startsWith(q));
+  const matchesQuery = (name: string) =>
+    name.toLowerCase().split(/\s+/).some((word) => word.startsWith(q));
+
+  const filteredPlayers = players.filter((player) => matchesQuery(player.name));
   const groups = groupPlayersByPosition(filteredPlayers);
-  const showManager = manager && manager.name.toLowerCase().startsWith(q);
+  const showManager = manager && matchesQuery(manager.name);
 
   return (
     <>
