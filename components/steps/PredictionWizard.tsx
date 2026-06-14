@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useState } from 'react';
 import Spinner from '../Spinner';
+import OptionSelector from '../OptionSelector';
 import { btnPrimary, btnSecondary, btnGold } from '../buttonStyles';
+import { TEAM_OPTIONS, PLAYER_OPTIONS } from '@/lib/predictionOptions';
 import type { Predictions, PredictionField } from '@/lib/fields';
-import { MAX_TEXT_LENGTH } from '@/lib/validation';
 
 type WizardField = { key: PredictionField; question: string; category: 0 | 1 };
 
@@ -47,7 +48,6 @@ export default function PredictionWizard({
 }) {
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const field = WIZARD_FIELDS[questionIndex];
   const category = field.category;
@@ -55,10 +55,6 @@ export default function PredictionWizard({
   const value = values[field.key];
   const isLast = questionIndex === WIZARD_FIELDS.length - 1;
   const overallProgress = ((questionIndex + 1) / WIZARD_FIELDS.length) * 100;
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [questionIndex]);
 
   function goToCategory(cat: 0 | 1) {
     setError(false);
@@ -114,13 +110,6 @@ export default function PredictionWizard({
     }
   }
 
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleNext();
-    }
-  }
-
   return (
     <div className="page-enter">
       <div className="glass-card w-full max-w-[700px] p-8 sm:p-10">
@@ -151,20 +140,16 @@ export default function PredictionWizard({
           {field.question}
         </h2>
 
-        <input
-          ref={inputRef}
-          type="text"
-          maxLength={MAX_TEXT_LENGTH}
-          placeholder="Type your answer..."
+        <OptionSelector
+          options={category === 0 ? TEAM_OPTIONS : PLAYER_OPTIONS}
+          kind={category === 0 ? 'team' : 'player'}
           value={value}
-          onChange={(e) => onChange(field.key, e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="typeform-input"
+          onChange={(name) => onChange(field.key, name)}
         />
 
         {error && (
           <span className="error-msg-summary show block w-full bg-red-500/10 border border-red-500/25 text-red-300 px-4 py-3 rounded-[10px] text-[0.9rem] mt-4 text-center">
-            Please enter an answer before continuing.
+            Please select an answer before continuing.
           </span>
         )}
 
