@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import BackgroundLayers from './BackgroundLayers';
 import Nav from './Nav';
 import Floodlights from './Floodlights';
-import EffectsCanvas, { type EffectType } from './EffectsCanvas';
 import Footer from './Footer';
 import WarningModal from './WarningModal';
-import WelcomeStep from './steps/WelcomeStep';
 import RegistrationStep, { type RegistrationValues } from './steps/RegistrationStep';
 import PredictionWizard from './steps/PredictionWizard';
 import ThankYouStep from './steps/ThankYouStep';
@@ -60,20 +59,14 @@ function loadStoredProgress(): StoredProgress {
   }
 }
 
-function effectForStep(step: number): EffectType {
-  if (step === 1) return 'confetti';
-  if (step === 4) return 'fireworks';
-  return 'none';
-}
-
 function backgroundImageIndex(step: number, questionIndex: number): number {
-  if (step === 1) return 0;
-  if (step === 2) return 1;
-  if (step === 3) return questionIndex < 6 ? 2 : 3;
+  if (step === 1) return 1;
+  if (step === 2) return questionIndex < 6 ? 2 : 3;
   return 4;
 }
 
-export default function ContestApp() {
+export default function PredictionFlow() {
+  const router = useRouter();
   const [progress, setProgress] = useState<StoredProgress>(loadStoredProgress);
   const [submissionId, setSubmissionId] = useState('');
   const [warning, setWarning] = useState<string | null>(null);
@@ -102,14 +95,9 @@ export default function ContestApp() {
       <BackgroundLayers activeImage={backgroundImageIndex(currentStep, questionIndex)} />
       <Nav />
       <Floodlights />
-      <EffectsCanvas effectType={effectForStep(currentStep)} />
 
       <main className="flex-1 flex justify-center items-center w-full max-w-[1100px] mx-auto px-5 pt-24 pb-20">
         {currentStep === 1 && (
-          <WelcomeStep onStart={() => setProgress((p) => ({ ...p, currentStep: 2 }))} />
-        )}
-
-        {currentStep === 2 && (
           <RegistrationStep
             initialValues={{
               Full_Name: formData.Full_Name,
@@ -120,7 +108,7 @@ export default function ContestApp() {
               setProgress((p) => ({
                 ...p,
                 formData: { ...p.formData, ...values },
-                currentStep: 3,
+                currentStep: 2,
                 questionIndex: 0,
               }))
             }
@@ -128,7 +116,7 @@ export default function ContestApp() {
           />
         )}
 
-        {currentStep === 3 && (
+        {currentStep === 2 && (
           <PredictionWizard
             values={formData}
             onChange={(field, value) =>
@@ -143,24 +131,25 @@ export default function ContestApp() {
             }}
             onSubmit={(newSubmissionId) => {
               setSubmissionId(newSubmissionId);
-              setProgress((p) => ({ ...p, currentStep: 4 }));
+              setProgress((p) => ({ ...p, currentStep: 3 }));
               try {
                 localStorage.removeItem(STORAGE_KEY);
               } catch (err) {
                 console.error(err);
               }
             }}
-            onBack={() => setProgress((p) => ({ ...p, currentStep: 2 }))}
+            onBack={() => setProgress((p) => ({ ...p, currentStep: 1 }))}
             onWarning={setWarning}
           />
         )}
 
-        {currentStep === 4 && (
+        {currentStep === 3 && (
           <ThankYouStep
             submissionId={submissionId}
             onReturnHome={() => {
               setSubmissionId('');
               resetProgress();
+              router.push('/');
             }}
           />
         )}
