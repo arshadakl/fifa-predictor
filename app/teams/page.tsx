@@ -2,12 +2,11 @@ import Nav from '@/components/Nav';
 import Floodlights from '@/components/Floodlights';
 import Footer from '@/components/Footer';
 import TeamCard from '@/components/TeamCard';
-import teamsData from '@/data/teams.json';
-import type { TeamsData } from '@/lib/teams';
+import { fetchTeamsData } from '@/lib/teams';
 
-const { teams } = teamsData as TeamsData;
+export default async function TeamsPage() {
+  const { teams } = await fetchTeamsData();
 
-export default function TeamsPage() {
   return (
     <>
       <Nav />

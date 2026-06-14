@@ -37,6 +37,15 @@ export type TeamsData = {
   teams: Team[];
 };
 
+const TEAMS_ENDPOINT =
+  'https://cxm-api.fifa.com/fifaplusweb/api/sections/teamsModule/4v5Yng3VdGD9c1cpnOIff1?locale=en&limit=200';
+
+export async function fetchTeamsData(): Promise<TeamsData> {
+  const res = await fetch(TEAMS_ENDPOINT, { next: { revalidate: 300 } });
+  if (!res.ok) throw new Error(`Failed to fetch teams: ${res.status}`);
+  return res.json();
+}
+
 // teamMatchResult: 0 = draw, 1 = win, 2 = loss
 export const FORM_RESULT_STYLES: Record<number, string> = {
   0: 'bg-white/30',
