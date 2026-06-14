@@ -97,7 +97,7 @@ export default function OptionSelector({
         />
       </div>
 
-      <div className="max-h-80 overflow-y-auto rounded-lg border border-white/10 scrollbar-thin">
+      <div className="max-h-[60rem] overflow-y-auto rounded-lg border border-white/10 scrollbar-thin">
         {visible.map((option) => {
           const isSelected = option.name.toLowerCase() === value.toLowerCase();
 
