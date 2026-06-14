@@ -31,7 +31,7 @@ export const PLAYER_OPTIONS: PlayerOption[] = Object.values(squadsData).flatMap(
     name: p.name,
     teamName: squad.teamName,
     flagSrc: flagUrl(squad.teamFlag, 1),
-    imageSrc: p.pictureUrl ? playerImageUrl(p.pictureUrl, 80) : null,
+    imageSrc: p.pictureUrl ? playerImageUrl(p.pictureUrl, 200) : null,
     position: p.position,
   })),
 ).sort((a, b) => a.name.localeCompare(b.name));

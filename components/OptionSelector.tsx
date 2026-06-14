@@ -20,18 +20,19 @@ function matchesQuery(name: string, query: string): boolean {
 }
 
 function OptionFlagOrPhoto({ option, size }: { option: Option; size: number }) {
-  const sizeClass = size === 40 ? 'h-10 w-10' : 'h-7 w-7';
+  const sizeClass = size === 40 ? 'h-24 w-24' : 'h-18 w-18';
 
   if (isPlayerOption(option)) {
     return option.imageSrc ? (
-      <Image
-        src={option.imageSrc}
-        alt=""
-        width={size}
-        height={size}
-        className={`${sizeClass} rounded-full border border-white/15 object-cover object-top shrink-0`}
-        unoptimized
-      />
+      <span className={`${sizeClass} relative overflow-hidden rounded-full border border-white/15 shrink-0 block`}>
+        <Image
+          src={option.imageSrc}
+          alt=""
+          fill
+          className="object-cover object-top scale-150 origin-top"
+          unoptimized
+        />
+      </span>
     ) : (
       <PlayerSilhouette className={`${sizeClass} rounded-full border border-white/15 bg-white/5 p-1 text-white/20 shrink-0`} />
     );
@@ -111,7 +112,7 @@ export default function OptionSelector({
               }`}
             >
               <span className="flex items-center gap-2.5 min-w-0">
-                <OptionFlagOrPhoto option={option} size={28} />
+                <OptionFlagOrPhoto option={option} size={58} />
                 <span className="truncate text-sm font-semibold text-white">{option.name}</span>
               </span>
               <span className="shrink-0 text-xs text-white/45">
