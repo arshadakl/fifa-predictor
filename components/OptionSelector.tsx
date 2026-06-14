@@ -29,7 +29,7 @@ function OptionFlagOrPhoto({ option, size }: { option: Option; size: number }) {
           src={option.imageSrc}
           alt=""
           fill
-          className="object-cover object-top scale-150 origin-top"
+          className="object-cover object-top scale-[1.75] origin-top"
           unoptimized
         />
       </span>
