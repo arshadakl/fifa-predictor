@@ -21,7 +21,7 @@ export type PlayerOption = {
 export const TEAM_OPTIONS: TeamOption[] = teamsData.teams.map((t) => ({
   id: t.teamId,
   name: t.teamName,
-  flagSrc: flagUrl(t.teamFlag, 1),
+  flagSrc: flagUrl(t.teamFlag, 4),
   stage: t.stage,
 }));
 
@@ -30,7 +30,7 @@ export const PLAYER_OPTIONS: PlayerOption[] = Object.values(squadsData).flatMap(
     id: `${squad.idTeam}-${p.idPlayer}`,
     name: p.name,
     teamName: squad.teamName,
-    flagSrc: flagUrl(squad.teamFlag, 1),
+    flagSrc: flagUrl(squad.teamFlag, 4),
     imageSrc: p.pictureUrl ? playerImageUrl(p.pictureUrl, 250) : null,
     position: p.position,
   })),
