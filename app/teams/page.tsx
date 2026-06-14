@@ -1,7 +1,7 @@
 import Nav from '@/components/Nav';
 import Floodlights from '@/components/Floodlights';
 import Footer from '@/components/Footer';
-import TeamCard from '@/components/TeamCard';
+import TeamsGrid from '@/components/TeamsGrid';
 import { fetchTeamsData } from '@/lib/teams';
 
 export default async function TeamsPage() {
@@ -17,11 +17,7 @@ export default async function TeamsPage() {
           Qualified <span className="text-(--color-gold-3)">Teams</span>
         </h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {teams.map((team) => (
-            <TeamCard key={team.teamId} team={team} />
-          ))}
-        </div>
+        <TeamsGrid teams={teams} />
       </main>
 
       <Footer />
