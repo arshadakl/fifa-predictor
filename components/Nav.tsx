@@ -1,7 +1,20 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/teams', label: 'Teams' },
+];
+
+const LINK_BASE_CLASS =
+  'font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase no-underline pb-1 transition-colors border-b-2';
 
 export default function Nav() {
+  const pathname = usePathname();
+
   return (
     <header className="fixed top-0 inset-x-0 z-20 bg-(--color-nav-dark) border-b border-(--color-blue-3)/20">
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 h-[60px] flex items-center justify-between gap-6">
@@ -19,24 +32,21 @@ export default function Nav() {
         </Link>
 
         <nav className="hidden sm:flex items-center gap-8">
-          <Link
-            href="/"
-            className="font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase no-underline pb-1 transition-colors text-white border-b-2 border-(--color-gold-3)"
-          >
-            Home
-          </Link>
-          <Link
-            href="/teams"
-            className="font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase text-white/55 no-underline pb-1 transition-colors hover:text-white"
-          >
-            Teams
-          </Link>
-          <a
-            href="#"
-            className="font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase text-white/55 no-underline pb-1 transition-colors hover:text-white"
-          >
-            Rules
-          </a>
+          {NAV_LINKS.map((link) => {
+            const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`${LINK_BASE_CLASS} ${
+                  isActive ? 'text-white border-(--color-gold-3)' : 'text-white/55 border-transparent hover:text-white'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <Link

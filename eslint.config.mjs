@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // standalone CommonJS data-fetch scripts
+    "squad-fetch.js",
   ]),
 ]);
 
