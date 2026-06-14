@@ -69,6 +69,7 @@ export default function PredictionFlow() {
   const router = useRouter();
   const [progress, setProgress] = useState<StoredProgress>(loadStoredProgress);
   const [submissionId, setSubmissionId] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
 
   const { currentStep, formData, questionIndex } = progress;
@@ -92,12 +93,12 @@ export default function PredictionFlow() {
 
   return (
     <>
-      <BackgroundLayers activeImage={backgroundImageIndex(currentStep, questionIndex)} />
+      <BackgroundLayers activeImage={submitted ? 4 : backgroundImageIndex(currentStep, questionIndex)} />
       <Nav />
       <Floodlights />
 
       <main className="flex-1 flex justify-center items-center w-full max-w-[1100px] mx-auto px-5 pt-24 pb-20">
-        {currentStep === 1 && (
+        {!submitted && currentStep === 1 && (
           <RegistrationStep
             initialValues={{
               Full_Name: formData.Full_Name,
@@ -116,7 +117,7 @@ export default function PredictionFlow() {
           />
         )}
 
-        {currentStep === 2 && (
+        {!submitted && currentStep === 2 && (
           <PredictionWizard
             values={formData}
             onChange={(field, value) =>
@@ -131,24 +132,20 @@ export default function PredictionFlow() {
             }}
             onSubmit={(newSubmissionId) => {
               setSubmissionId(newSubmissionId);
-              setProgress((p) => ({ ...p, currentStep: 3 }));
-              try {
-                localStorage.removeItem(STORAGE_KEY);
-              } catch (err) {
-                console.error(err);
-              }
+              setSubmitted(true);
+              resetProgress();
             }}
             onBack={() => setProgress((p) => ({ ...p, currentStep: 1 }))}
             onWarning={setWarning}
           />
         )}
 
-        {currentStep === 3 && (
+        {submitted && (
           <ThankYouStep
             submissionId={submissionId}
             onReturnHome={() => {
               setSubmissionId('');
-              resetProgress();
+              setSubmitted(false);
               router.push('/');
             }}
           />
