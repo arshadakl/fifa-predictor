@@ -4,7 +4,14 @@ import Floodlights from '@/components/Floodlights';
 import Footer from '@/components/Footer';
 import PlayerCard from '@/components/PlayerCard';
 import ManagerCard from '@/components/ManagerCard';
-import { fetchSquadData, flagUrl, groupPlayersByPosition } from '@/lib/teams';
+import { fetchSquadData, fetchTeamsData, flagUrl, groupPlayersByPosition } from '@/lib/teams';
+
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const { teams } = await fetchTeamsData();
+  return teams.map((team) => ({ teamId: team.teamId }));
+}
 
 export default async function SquadPage({ params }: { params: Promise<{ teamId: string }> }) {
   const { teamId } = await params;
