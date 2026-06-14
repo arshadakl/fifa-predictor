@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   type Team,
   FORM_RESULT_STYLES,
@@ -23,7 +24,10 @@ export default function TeamCard({ team }: { team: Team }) {
   const nextMatch = team.nextMatch;
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-(--color-badge-dark)">
+    <Link
+      href={`/teams/${team.teamId}`}
+      className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-(--color-badge-dark) no-underline transition-colors hover:border-(--color-gold-3)/40"
+    >
       <div
         className="flex flex-col gap-3 p-4"
         style={{ backgroundColor: colors.primaryColor, color: colors.primaryTextColor }}
@@ -102,6 +106,6 @@ export default function TeamCard({ team }: { team: Team }) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
