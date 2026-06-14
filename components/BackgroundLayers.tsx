@@ -1,4 +1,4 @@
-const IMAGES = ['bg-page1-5.jpg', 'bg-page2.jpg', 'bg-page3.jpg', 'bg-page4.jpg', 'bg-page5.jpg'];
+const IMAGES = ['bg-page1-5.jpg', 'Argentina-v-France-Final-FIFA-World-Cup-Qatar-2022.webp', 'bg-page3.jpg', 'bg-page4.jpg', 'bg-page5.jpg'];
 
 // Hero (index 0) gets a dark, color-graded eFootball-style split-panel composition;
 // other steps keep the lighter cinematic overlay.
