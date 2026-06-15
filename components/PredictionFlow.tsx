@@ -10,7 +10,9 @@ import WarningModal from './WarningModal';
 import RegistrationStep, { type RegistrationValues } from './steps/RegistrationStep';
 import PredictionWizard from './steps/PredictionWizard';
 import ThankYouStep from './steps/ThankYouStep';
+import { usePublicConfig } from './ConfigProvider';
 import { PREDICTION_FIELDS, type Predictions } from '@/lib/fields';
+import { DEFAULT_REGISTRATION_CLOSED_MESSAGE } from '@/lib/config';
 
 type FormData = RegistrationValues & Predictions;
 
@@ -81,8 +83,15 @@ export default function PredictionFlow() {
   const [submissionId, setSubmissionId] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
+  const config = usePublicConfig();
 
   const { currentStep, formData, questionIndex } = progress;
+
+  // Config is seeded from the server in the root layout, so it is available on
+  // first render — no loading spinner. Fail open if it is somehow absent; the
+  // predict API enforces the registration window regardless.
+  const registrationClosed = config ? !config.registrationEnabled : false;
+  const closedMessage = config?.registrationClosedMessage ?? DEFAULT_REGISTRATION_CLOSED_MESSAGE;
 
   useEffect(() => {
     try {
@@ -117,6 +126,16 @@ export default function PredictionFlow() {
       <Floodlights />
 
       <main className="flex-1 flex justify-center items-center w-full max-w-[1100px] mx-auto px-5 pt-24 pb-20">
+        {registrationClosed ? (
+          <div className="page-enter glass-card w-full max-w-[550px] text-center px-6 py-10 sm:px-10">
+            <div className="text-5xl mb-4">⏱️</div>
+            <h2 className="font-(family-name:--font-heading) font-bold text-[1.8rem] mb-3 text-(--color-accent-gold)">
+              Predictions Closed
+            </h2>
+            <p className="text-(--color-text-secondary) leading-relaxed">{closedMessage}</p>
+          </div>
+        ) : (
+          <>
         {!isSubmitted && currentStep === 1 && (
           <RegistrationStep
             initialValues={{
@@ -164,6 +183,8 @@ export default function PredictionFlow() {
             submissionId={submissionId}
             onReturnHome={() => router.push('/')}
           />
+        )}
+          </>
         )}
       </main>
 

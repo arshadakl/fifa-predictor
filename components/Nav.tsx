@@ -5,12 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { btnSecondarySm } from './buttonStyles';
+import { usePublicConfig } from './ConfigProvider';
 import { cn } from '@/lib/utils';
 
-const NAV_LINKS = [
+const BASE_NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/teams', label: 'Teams' },
 ];
+
+const RESULTS_LINK = { href: '/results', label: 'Results' };
 
 const LINK_BASE_CLASS =
   'font-(family-name:--font-display) font-semibold text-[13px] tracking-[0.1em] uppercase no-underline pb-1 transition-colors border-b-2';
@@ -22,6 +25,10 @@ interface NavProps {
 export default function Nav({ onReset }: Readonly<NavProps>) {
   const pathname = usePathname();
   const [confirmReset, setConfirmReset] = useState(false);
+  const config = usePublicConfig();
+
+  // Results link only shows once the admin has published results.
+  const navLinks = config?.resultsPublished ? [...BASE_NAV_LINKS, RESULTS_LINK] : BASE_NAV_LINKS;
 
   const isPrediction = pathname === '/prediction';
 
@@ -48,7 +55,7 @@ export default function Nav({ onReset }: Readonly<NavProps>) {
         </Link>
 
         <nav className="hidden sm:flex items-center gap-8">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
 
             return (

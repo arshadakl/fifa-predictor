@@ -131,6 +131,30 @@
   }
 }
 
+/* Lineup reveal: each prediction card eases up, fades and settles from a slight
+   scale. Cards are given a staggered animation-delay inline so the formation
+   cascades onto the pitch. `both` keeps them hidden through the delay. */
+@keyframes lineupCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lineup-card {
+  animation: lineupCardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lineup-card {
+    animation: none;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

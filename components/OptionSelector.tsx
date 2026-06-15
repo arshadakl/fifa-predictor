@@ -11,7 +11,7 @@ type Option = TeamOption | PlayerOption;
 
 const PLAYER_LIST_CAP = 50;
 
-function isPlayerOption(option: Option): option is PlayerOption {
+export function isPlayerOption(option: Option): option is PlayerOption {
   return 'teamName' in option;
 }
 
@@ -23,11 +23,16 @@ function matchesQuery(name: string, query: string): boolean {
 interface OptionFlagOrPhotoProps {
   option: Option;
   size: number;
+  // Wrapper sizing classes. Defaults preserve the wizard's two sizes; the admin
+  // passes a compact override (e.g. 'h-10 w-10') for dense field/detail rows.
+  sizeClass?: string;
 }
 
-function OptionFlagOrPhoto({ option, size }: Readonly<OptionFlagOrPhotoProps>) {
-  const sizeClass = size === 40 ? 'h-24 w-24' : 'h-18 w-18';
-
+export function OptionFlagOrPhoto({
+  option,
+  size,
+  sizeClass = size === 40 ? 'h-24 w-24' : 'h-18 w-18',
+}: Readonly<OptionFlagOrPhotoProps>) {
   if (isPlayerOption(option)) {
     return option.imageSrc ? (
       <span className={`${sizeClass} relative overflow-hidden rounded-full border border-white/15 shrink-0 block`}>

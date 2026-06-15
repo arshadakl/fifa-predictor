@@ -23,7 +23,7 @@ const FORMATION: PreviewSlot[][] = [
     { field: 'Third_Place', label: 'Third Place', kind: 'team' },
     { field: 'Fair_Play_Award', label: 'Fair Play', kind: 'team' },
     { field: 'Most_Entertaining_Team', label: 'Entertainer', kind: 'team' },
-    { field: 'Dark_Horse', label: 'Dark Horse', kind: 'team' },
+    { field: 'Dark_Horse', label: 'Most entertaining and Dark horses', kind: 'team' },
   ],
   [{ field: 'Golden_Glove', label: 'Golden Glove', kind: 'player' }],
 ];
@@ -31,9 +31,10 @@ const FORMATION: PreviewSlot[][] = [
 interface PreviewCardProps {
   slot: PreviewSlot;
   value: string;
+  index: number;
 }
 
-function PreviewCard({ slot, value }: Readonly<PreviewCardProps>) {
+function PreviewCard({ slot, value, index }: Readonly<PreviewCardProps>) {
   const isGoalkeeper = slot.field === 'Golden_Glove';
 
   let imageSrc: string | null = null;
@@ -44,7 +45,10 @@ function PreviewCard({ slot, value }: Readonly<PreviewCardProps>) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-1.5 w-[4.5rem] sm:w-24 text-center">
+    <div
+      className="lineup-card flex flex-col items-center gap-1.5 w-[4.5rem] sm:w-24 text-center"
+      style={{ animationDelay: `${index * 80}ms` }}
+    >
       <div
         className={cn(
           'h-12 w-12 sm:h-14 sm:w-14 rounded-full border-2 flex items-center justify-center overflow-hidden shrink-0 bg-black/20',
@@ -80,6 +84,28 @@ function PreviewCard({ slot, value }: Readonly<PreviewCardProps>) {
   );
 }
 
+// Pitch-only view of a set of predictions (no heading, no actions). Shared by
+// the wizard's submit preview and the public results "view predictions" modal.
+export function PredictionPitch({ values }: Readonly<{ values: Predictions }>) {
+  // Running index across all rows so the stagger cascades top-to-bottom.
+  const rowStart = FORMATION.reduce<number[]>((acc, row, i) => {
+    acc.push(i === 0 ? 0 : acc[i - 1] + FORMATION[i - 1].length);
+    return acc;
+  }, []);
+
+  return (
+    <div className="pitch-field flex flex-col justify-between gap-6 px-3 sm:px-6 py-6 sm:py-10 min-h-[420px] sm:min-h-[480px]">
+      {FORMATION.map((row, i) => (
+        <div key={i} className="relative z-10 flex justify-center gap-3 sm:gap-6 flex-wrap">
+          {row.map((slot, j) => (
+            <PreviewCard key={slot.field} slot={slot} value={values[slot.field]} index={rowStart[i] + j} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface PredictionPreviewProps {
   values: Predictions;
   onSubmit: () => void;
@@ -93,15 +119,7 @@ export default function PredictionPreview({ values, onSubmit, isSubmitting }: Re
         Your Prediction Preview
       </h2>
 
-      <div className="pitch-field flex flex-col justify-between gap-6 px-3 sm:px-6 py-6 sm:py-10 min-h-[420px] sm:min-h-[480px]">
-        {FORMATION.map((row, i) => (
-          <div key={i} className="relative z-10 flex justify-center gap-3 sm:gap-6 flex-wrap">
-            {row.map((slot) => (
-              <PreviewCard key={slot.field} slot={slot} value={values[slot.field]} />
-            ))}
-          </div>
-        ))}
-      </div>
+      <PredictionPitch values={values} />
 
       <div className="flex justify-center mt-8">
         <button onClick={onSubmit} disabled={isSubmitting} className={btnGoldSm}>

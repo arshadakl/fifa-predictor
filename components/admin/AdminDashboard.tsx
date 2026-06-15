@@ -7,9 +7,19 @@ import MetricsGrid from './MetricsGrid';
 import ActualsForm from './ActualsForm';
 import LeaderboardTable from './LeaderboardTable';
 import DetailModal from './DetailModal';
+import EventControls from './EventControls';
 import { btnSecondary } from '../buttonStyles';
 import type { Predictions, Submission } from '@/lib/fields';
-import { fetchSubmissions, calculateScores } from '@/lib/api';
+import { fetchSubmissions, calculateScores, fetchActuals, saveActuals } from '@/lib/api';
+import { cn } from '@/lib/utils';
+
+type AdminTab = 'leaderboard' | 'actuals' | 'controls';
+
+const TABS: { id: AdminTab; label: string }[] = [
+  { id: 'leaderboard', label: 'Participant Leaderboard' },
+  { id: 'actuals', label: 'Enter Actual Tournament Results' },
+  { id: 'controls', label: 'Event Controls' },
+];
 
 const EMPTY_ACTUALS: Predictions = {
   World_Cup_Winner: '',
@@ -46,6 +56,8 @@ export default function AdminDashboard() {
   const [selected, setSelected] = useState<Submission | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [activeTab, setActiveTab] = useState<AdminTab>('leaderboard');
 
   useEffect(() => {
     async function loadSubmissions() {
@@ -70,6 +82,27 @@ export default function AdminDashboard() {
     loadSubmissions();
   }, []);
 
+  // Load saved actuals from the sheet so the form is consistent across browsers
+  // (localStorage above only gives an instant first paint). Sheet wins.
+  useEffect(() => {
+    async function loadActuals() {
+      try {
+        const { ok, status, result } = await fetchActuals();
+        if (status === 401) {
+          window.location.assign('/admin/login');
+          return;
+        }
+        if (ok && result.success) {
+          setActuals((prev) => ({ ...prev, ...result.actuals }));
+        }
+      } catch (err) {
+        console.error('Failed to load actuals:', err);
+      }
+    }
+
+    loadActuals();
+  }, []);
+
   function showToast(message: string) {
     setToast(message);
     setTimeout(() => setToast(null), 3000);
@@ -82,6 +115,34 @@ export default function AdminDashboard() {
       console.error('Logout failed:', err);
     } finally {
       window.location.assign('/admin/login');
+    }
+  }
+
+  async function handleClearActuals() {
+    setClearing(true);
+    setActuals(EMPTY_ACTUALS);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      console.error(err);
+    }
+
+    try {
+      const { ok, status, result } = await saveActuals(EMPTY_ACTUALS);
+      if (status === 401) {
+        window.location.assign('/admin/login');
+        return;
+      }
+      if (ok && result.success) {
+        showToast('Actual results cleared.');
+      } else {
+        showToast('Cleared the form, but saving to the sheet failed.');
+      }
+    } catch (err) {
+      console.error('Clear actuals failed:', err);
+      showToast('Cleared the form, but could not reach the server.');
+    } finally {
+      setClearing(false);
     }
   }
 
@@ -139,15 +200,33 @@ export default function AdminDashboard() {
 
         <MetricsGrid submissions={submissions} />
 
-        <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-8 items-start">
+        <div className="flex gap-2 flex-wrap border-b border-(--color-border-subtle) pb-4">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={cn('category-pill', activeTab === tab.id && 'active')}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'leaderboard' && (
+          <LeaderboardTable submissions={submissions} onSelect={setSelected} />
+        )}
+        {activeTab === 'actuals' && (
           <ActualsForm
             actuals={actuals}
             onChange={(field, value) => setActuals((prev) => ({ ...prev, [field]: value }))}
             onCalculate={handleCalculate}
             calculating={calculating}
+            onClear={handleClearActuals}
+            clearing={clearing}
           />
-          <LeaderboardTable submissions={submissions} onSelect={setSelected} />
-        </div>
+        )}
+        {activeTab === 'controls' && <EventControls submissions={submissions} onToast={showToast} />}
       </main>
 
       <DetailModal submission={selected} actuals={actuals} onClose={() => setSelected(null)} />

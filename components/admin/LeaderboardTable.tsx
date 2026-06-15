@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Submission } from '@/lib/fields';
 import { btnSecondary } from '../buttonStyles';
+import { formatTimestamp } from '@/lib/utils';
 
 const RANK_COLORS = ['text-(--color-accent-gold)', 'text-[#C0C0C0]', 'text-[#CD7F32]'];
 
@@ -60,7 +61,7 @@ export default function LeaderboardTable({
         <table className="w-full border-collapse text-left text-[0.95rem] min-w-[800px]">
           <thead>
             <tr>
-              {['Rank', 'Submission ID', 'Name', 'Email', 'Mobile', 'Score', 'Predictions Detail'].map((h) => (
+              {['Rank', 'Submission ID', 'Name', 'Email', 'Mobile', 'Submitted', 'Score', 'Predictions Detail'].map((h) => (
                 <th
                   key={h}
                   className="bg-[rgba(16,24,39,0.8)] font-(family-name:--font-heading) font-bold text-white p-4 border-b border-(--color-border-subtle) uppercase text-[0.8rem] tracking-[0.5px]"
@@ -73,7 +74,7 @@ export default function LeaderboardTable({
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center p-10 text-(--color-text-secondary) italic">
+                <td colSpan={8} className="text-center p-10 text-(--color-text-secondary) italic">
                   No matching participant predictions found.
                 </td>
               </tr>
@@ -106,6 +107,7 @@ export default function LeaderboardTable({
                     <td className="p-4 text-white">{s.Full_Name}</td>
                     <td className="p-4 text-(--color-text-secondary)">{s.Email_Address}</td>
                     <td className="p-4 text-(--color-text-secondary)">{s.Mobile_Number}</td>
+                    <td className="p-4 text-(--color-text-secondary) whitespace-nowrap">{formatTimestamp(s.Timestamp)}</td>
                     <td className="p-4 text-(--color-text-secondary)">
                       <span className="bg-(--color-accent-blue)/10 text-(--color-accent-blue) px-2.5 py-1 rounded-lg font-bold font-(family-name:--font-heading) text-[1.05rem] inline-block">
                         {s.Total_Score !== undefined ? s.Total_Score : 0}

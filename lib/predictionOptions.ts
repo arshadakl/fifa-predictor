@@ -51,3 +51,17 @@ export const PLAYER_OPTIONS: PlayerOption[] = RAW_PLAYER_OPTIONS.map((p) => ({
   ...p,
   name: (NAME_COUNTS.get(p.name.toLowerCase()) ?? 0) > 1 ? `${p.name} (${p.teamName})` : p.name,
 })).sort((a, b) => a.name.localeCompare(b.name));
+
+// Case-insensitive name -> option lookups. Used by the admin (actuals form,
+// prediction-detail modal) to resolve any stored answer string back to its flag
+// or player photo. Built once at import time.
+const TEAM_BY_NAME = new Map(TEAM_OPTIONS.map((o) => [o.name.toLowerCase(), o]));
+const PLAYER_BY_NAME = new Map(PLAYER_OPTIONS.map((o) => [o.name.toLowerCase(), o]));
+
+export function findTeamOption(name: string): TeamOption | undefined {
+  return TEAM_BY_NAME.get(name.trim().toLowerCase());
+}
+
+export function findPlayerOption(name: string): PlayerOption | undefined {
+  return PLAYER_BY_NAME.get(name.trim().toLowerCase());
+}
