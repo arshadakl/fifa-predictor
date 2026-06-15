@@ -1,6 +1,10 @@
 import type { Submission } from '@/lib/fields';
 
-export default function MetricsGrid({ submissions }: { submissions: Submission[] }) {
+interface MetricsGridProps {
+  submissions: Submission[];
+}
+
+export default function MetricsGrid({ submissions }: Readonly<MetricsGridProps>) {
   const scores = submissions.map((s) => s.Total_Score || 0);
   const highest = scores.length ? Math.max(...scores) : 0;
   const lowest = scores.length ? Math.min(...scores) : 0;

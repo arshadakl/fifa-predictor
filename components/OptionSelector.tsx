@@ -5,6 +5,7 @@ import Image from 'next/image';
 import type { TeamOption, PlayerOption } from '@/lib/predictionOptions';
 import PlayerSilhouette from './PlayerSilhouette';
 import SearchInput from './SearchInput';
+import { cn } from '@/lib/utils';
 
 type Option = TeamOption | PlayerOption;
 
@@ -19,7 +20,12 @@ function matchesQuery(name: string, query: string): boolean {
   return name.toLowerCase().split(/\s+/).some((word) => word.startsWith(query));
 }
 
-function OptionFlagOrPhoto({ option, size }: { option: Option; size: number }) {
+interface OptionFlagOrPhotoProps {
+  option: Option;
+  size: number;
+}
+
+function OptionFlagOrPhoto({ option, size }: Readonly<OptionFlagOrPhotoProps>) {
   const sizeClass = size === 40 ? 'h-24 w-24' : 'h-18 w-18';
 
   if (isPlayerOption(option)) {
@@ -50,17 +56,19 @@ function OptionFlagOrPhoto({ option, size }: { option: Option; size: number }) {
   );
 }
 
+interface OptionSelectorProps {
+  options: Option[];
+  kind: 'team' | 'player';
+  value: string;
+  onChange: (name: string) => void;
+}
+
 export default function OptionSelector({
   options,
   kind,
   value,
   onChange,
-}: {
-  options: Option[];
-  kind: 'team' | 'player';
-  value: string;
-  onChange: (name: string) => void;
-}) {
+}: Readonly<OptionSelectorProps>) {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
 
@@ -107,9 +115,10 @@ export default function OptionSelector({
               key={option.id}
               type="button"
               onClick={() => onChange(option.name)}
-              className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors border-b border-white/5 last:border-b-0 ${
+              className={cn(
+                'flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors border-b border-white/5 last:border-b-0',
                 isSelected ? 'bg-(--color-gold-3)/10' : 'hover:bg-white/5'
-              }`}
+              )}
             >
               <span className="flex items-center gap-2.5 min-w-0">
                 <OptionFlagOrPhoto option={option} size={58} />

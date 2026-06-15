@@ -16,17 +16,19 @@ const FIELD_ID: Record<keyof Predictions, string> = {
   Best_Young_Player: 'act-young-player',
 };
 
+interface ActualsFormProps {
+  actuals: Predictions;
+  onChange: (field: keyof Predictions, value: string) => void;
+  onCalculate: () => void;
+  calculating: boolean;
+}
+
 export default function ActualsForm({
   actuals,
   onChange,
   onCalculate,
   calculating,
-}: {
-  actuals: Predictions;
-  onChange: (field: keyof Predictions, value: string) => void;
-  onCalculate: () => void;
-  calculating: boolean;
-}) {
+}: Readonly<ActualsFormProps>) {
   function field(key: keyof Predictions, label: string, className = '') {
     return (
       <FloatingLabelInput

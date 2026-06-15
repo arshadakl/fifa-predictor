@@ -9,6 +9,7 @@ import LeaderboardTable from './LeaderboardTable';
 import DetailModal from './DetailModal';
 import { btnSecondary } from '../buttonStyles';
 import type { Predictions, Submission } from '@/lib/fields';
+import { fetchSubmissions, calculateScores } from '@/lib/api';
 
 const EMPTY_ACTUALS: Predictions = {
   World_Cup_Winner: '',
@@ -49,9 +50,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function loadSubmissions() {
       try {
-        const response = await fetch('/api/admin/submissions');
-        const result = await response.json();
-        if (response.ok && result.success) {
+        const { ok, result } = await fetchSubmissions();
+        if (ok && result.success) {
           setSubmissions(result.submissions);
         } else {
           throw new Error(result.message || 'Failed to load submissions');
@@ -80,14 +80,8 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await fetch('/api/admin/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(actuals),
-      });
-
-      const result = await response.json();
-      if (response.ok && result.success) {
+      const { ok, result } = await calculateScores(actuals);
+      if (ok && result.success) {
         setSubmissions(result.submissions);
         showToast(result.message || 'Scores and rankings computed successfully!');
       } else {

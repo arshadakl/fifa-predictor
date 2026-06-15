@@ -15,15 +15,17 @@ const FIELDS: { label: string; key: keyof Predictions; points: number }[] = [
   { label: 'Best Young Player (1 pt)', key: 'Best_Young_Player', points: 1 },
 ];
 
+interface DetailModalProps {
+  submission: Submission | null;
+  actuals: Predictions;
+  onClose: () => void;
+}
+
 export default function DetailModal({
   submission,
   actuals,
   onClose,
-}: {
-  submission: Submission | null;
-  actuals: Predictions;
-  onClose: () => void;
-}) {
+}: Readonly<DetailModalProps>) {
   if (!submission) return null;
 
   return (

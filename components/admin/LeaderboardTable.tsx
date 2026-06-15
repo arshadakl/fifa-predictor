@@ -6,13 +6,15 @@ import { btnSecondary } from '../buttonStyles';
 
 const RANK_COLORS = ['text-(--color-accent-gold)', 'text-[#C0C0C0]', 'text-[#CD7F32]'];
 
+interface LeaderboardTableProps {
+  submissions: Submission[];
+  onSelect: (submission: Submission) => void;
+}
+
 export default function LeaderboardTable({
   submissions,
   onSelect,
-}: {
-  submissions: Submission[];
-  onSelect: (submission: Submission) => void;
-}) {
+}: Readonly<LeaderboardTableProps>) {
   const [query, setQuery] = useState('');
 
   const filtered = submissions.filter((s) => {

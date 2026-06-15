@@ -1,16 +1,18 @@
 import { PhoneIcon } from './icons';
 
+interface MobileNumberInputProps {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}
+
 export default function MobileNumberInput({
   id,
   value,
   onChange,
   error,
-}: {
-  id: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-}) {
+}: Readonly<MobileNumberInputProps>) {
   return (
     <div className="mb-5">
       <label htmlFor={id} className="block mb-2 text-[0.7rem] font-semibold tracking-[1.5px] uppercase text-(--color-text-secondary)">

@@ -79,7 +79,7 @@ export default function PredictionFlow() {
   const router = useRouter();
   const [progress, setProgress] = useState<StoredProgress>(loadStoredProgress);
   const [submissionId, setSubmissionId] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
 
   const { currentStep, formData, questionIndex } = progress;
@@ -103,12 +103,12 @@ export default function PredictionFlow() {
 
   return (
     <>
-      <BackgroundLayers activeImage={submitted ? 4 : backgroundImageIndex(currentStep, questionIndex)} />
+      <BackgroundLayers activeImage={isSubmitted ? 4 : backgroundImageIndex(currentStep, questionIndex)} />
       <Nav />
       <Floodlights />
 
       <main className="flex-1 flex justify-center items-center w-full max-w-[1100px] mx-auto px-5 pt-24 pb-20">
-        {!submitted && currentStep === 1 && (
+        {!isSubmitted && currentStep === 1 && (
           <RegistrationStep
             initialValues={{
               Full_Name: formData.Full_Name,
@@ -127,7 +127,7 @@ export default function PredictionFlow() {
           />
         )}
 
-        {!submitted && currentStep === 2 && (
+        {!isSubmitted && currentStep === 2 && (
           <PredictionWizard
             values={formData}
             onChange={(field, value) =>
@@ -142,7 +142,7 @@ export default function PredictionFlow() {
             }}
             onSubmit={(newSubmissionId) => {
               setSubmissionId(newSubmissionId);
-              setSubmitted(true);
+              setIsSubmitted(true);
               resetProgress();
             }}
             onBack={() => setProgress((p) => ({ ...p, currentStep: 1 }))}
@@ -150,7 +150,7 @@ export default function PredictionFlow() {
           />
         )}
 
-        {submitted && (
+        {isSubmitted && (
           <ThankYouStep
             submissionId={submissionId}
             onReturnHome={() => router.push('/')}

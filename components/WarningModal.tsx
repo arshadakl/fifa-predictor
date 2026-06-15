@@ -1,10 +1,12 @@
+interface WarningModalProps {
+  message: string | null;
+  onClose: () => void;
+}
+
 export default function WarningModal({
   message,
   onClose,
-}: {
-  message: string | null;
-  onClose: () => void;
-}) {
+}: Readonly<WarningModalProps>) {
   if (!message) return null;
 
   return (

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -24,10 +25,10 @@ export default function Nav() {
             alt="FIFA World Cup logo"
             width={76}
             height={76}
-            className="h-9 w-9 object-contain"
+            className="h-12 w-12 object-contain"
           />
           <span className="font-(family-name:--font-display) font-extrabold text-lg sm:text-xl tracking-wider text-white uppercase whitespace-nowrap">
-            FIFA World Cup <span className="text-(--color-gold-3)">26</span>
+           sports gallery <span className="text-(--color-gold-3)">26</span>
           </span>
         </Link>
 
@@ -39,9 +40,10 @@ export default function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`${LINK_BASE_CLASS} ${
+                className={cn(
+                  LINK_BASE_CLASS,
                   isActive ? 'text-white border-(--color-gold-3)' : 'text-white/55 border-transparent hover:text-white'
-                }`}
+                )}
               >
                 {link.label}
               </Link>

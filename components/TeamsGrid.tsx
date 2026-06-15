@@ -5,7 +5,11 @@ import { type Team } from '@/lib/teams';
 import TeamCard from './TeamCard';
 import SearchInput from './SearchInput';
 
-export default function TeamsGrid({ teams }: { teams: Team[] }) {
+interface TeamsGridProps {
+  teams: Team[];
+}
+
+export default function TeamsGrid({ teams }: Readonly<TeamsGridProps>) {
   const [query, setQuery] = useState('');
 
   const q = query.trim().toLowerCase();

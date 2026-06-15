@@ -9,11 +9,16 @@ import {
   getOpponentScore,
   getOwnScore,
 } from '@/lib/teams';
+import { cn } from '@/lib/utils';
 
 const ROW_LABEL_CLASS = 'text-[11px] tracking-[0.1em] uppercase text-white/45';
 const ROW_VALUE_CLASS = 'flex items-center gap-1.5 text-[13px] font-semibold text-white';
 
-export default function TeamCard({ team }: { team: Team }) {
+interface TeamCardProps {
+  team: Team;
+}
+
+export default function TeamCard({ team }: Readonly<TeamCardProps>) {
   const { teamEnrichmentData: colors } = team;
   const formSlots = Array.from({ length: 5 }, (_, i) => {
     const result = team.teamTournamentForm[team.teamTournamentForm.length - 5 + i];
@@ -57,7 +62,7 @@ export default function TeamCard({ team }: { team: Team }) {
             {formSlots.map((result, i) => (
               <span
                 key={i}
-                className={`h-2 w-2 rounded-full ${result === undefined ? 'bg-white/10' : FORM_RESULT_STYLES[result]}`}
+                className={cn('h-2 w-2 rounded-full', result === undefined ? 'bg-white/10' : FORM_RESULT_STYLES[result])}
               />
             ))}
           </div>

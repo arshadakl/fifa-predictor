@@ -1,12 +1,14 @@
 import { btnSecondary } from '../buttonStyles';
 
+interface ThankYouStepProps {
+  submissionId: string;
+  onReturnHome: () => void;
+}
+
 export default function ThankYouStep({
   submissionId,
   onReturnHome,
-}: {
-  submissionId: string;
-  onReturnHome: () => void;
-}) {
+}: Readonly<ThankYouStepProps>) {
   return (
     <div className="page-enter">
       <div className="glass-card w-full max-w-[650px] p-10 text-center flex flex-col items-center">

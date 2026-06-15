@@ -1,12 +1,14 @@
+interface SearchInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}
+
 export default function SearchInput({
   value,
   onChange,
   placeholder,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
+}: Readonly<SearchInputProps>) {
   return (
     <input
       type="text"

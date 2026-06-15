@@ -1,5 +1,16 @@
 import type { ReactNode } from 'react';
 
+interface IconInputProps {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  placeholder?: string;
+  error?: string;
+}
+
 export default function IconInput({
   id,
   label,
@@ -9,16 +20,7 @@ export default function IconInput({
   type = 'text',
   placeholder,
   error,
-}: {
-  id: string;
-  label: string;
-  icon: ReactNode;
-  value: string;
-  onChange: (value: string) => void;
-  type?: string;
-  placeholder?: string;
-  error?: string;
-}) {
+}: Readonly<IconInputProps>) {
   return (
     <div className="mb-5">
       <label htmlFor={id} className="block mb-2 text-[0.7rem] font-semibold tracking-[1.5px] uppercase text-(--color-text-secondary)">

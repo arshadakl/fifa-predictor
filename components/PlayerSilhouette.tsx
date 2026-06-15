@@ -1,4 +1,8 @@
-export default function PlayerSilhouette({ className }: { className?: string }) {
+interface PlayerSilhouetteProps {
+  className?: string;
+}
+
+export default function PlayerSilhouette({ className }: Readonly<PlayerSilhouetteProps>) {
   return (
     <svg viewBox="0 0 100 100" fill="currentColor" className={className} aria-hidden="true">
       <circle cx="50" cy="34" r="20" />

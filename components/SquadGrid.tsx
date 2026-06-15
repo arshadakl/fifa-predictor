@@ -6,15 +6,17 @@ import PlayerCard from './PlayerCard';
 import ManagerCard from './ManagerCard';
 import SearchInput from './SearchInput';
 
+interface SquadGridProps {
+  players: SquadPlayer[];
+  manager: SquadOfficial | null;
+  flagSrc: string;
+}
+
 export default function SquadGrid({
   players,
   manager,
   flagSrc,
-}: {
-  players: SquadPlayer[];
-  manager: SquadOfficial | null;
-  flagSrc: string;
-}) {
+}: Readonly<SquadGridProps>) {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
 

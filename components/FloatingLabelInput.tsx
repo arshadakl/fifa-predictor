@@ -1,4 +1,4 @@
-type Props = {
+interface FloatingLabelInputProps {
   id: string;
   label: string;
   value: string;
@@ -8,7 +8,7 @@ type Props = {
   error?: string;
   className?: string;
   required?: boolean;
-};
+}
 
 export default function FloatingLabelInput({
   id,
@@ -20,7 +20,7 @@ export default function FloatingLabelInput({
   error,
   className = '',
   required = true,
-}: Props) {
+}: Readonly<FloatingLabelInputProps>) {
   return (
     <div className={`input-group mb-6 ${className}`}>
       <input

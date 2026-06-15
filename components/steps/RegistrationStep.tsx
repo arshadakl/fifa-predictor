@@ -7,6 +7,7 @@ import Spinner from '../Spinner';
 import { UserIcon, MailIcon, ArrowRightIcon } from '../icons';
 import { btnPrimary } from '../buttonStyles';
 import Image from 'next/image';
+import { checkDuplicate } from '@/lib/api';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
@@ -17,15 +18,17 @@ export type RegistrationValues = {
   Email_Address: string;
 };
 
+interface RegistrationStepProps {
+  initialValues: RegistrationValues;
+  onNext: (values: RegistrationValues) => void;
+  onWarning: (message: string) => void;
+}
+
 export default function RegistrationStep({
   initialValues,
   onNext,
   onWarning,
-}: {
-  initialValues: RegistrationValues;
-  onNext: (values: RegistrationValues) => void;
-  onWarning: (message: string) => void;
-}) {
+}: Readonly<RegistrationStepProps>) {
   const [fullName, setFullName] = useState(initialValues.Full_Name);
   const [mobile, setMobile] = useState(initialValues.Mobile_Number.replace(/^\+91/, ''));
   const [email, setEmail] = useState(initialValues.Email_Address);
@@ -44,21 +47,16 @@ export default function RegistrationStep({
 
     setSubmitting(true);
     try {
-      const response = await fetch('/api/check-duplicate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ Mobile_Number: fullMobile, Email_Address: email.trim() }),
-      });
+      const { status, ok, result } = await checkDuplicate({ Mobile_Number: fullMobile, Email_Address: email.trim() });
 
-      if (response.status === 409) {
-        const result = await response.json().catch(() => null);
+      if (status === 409) {
         onWarning(
-          result?.message ||
+          result.message ||
             'You have already submitted a prediction. Only one entry per participant is permitted.'
         );
         return;
       }
-      if (!response.ok) {
+      if (!ok) {
         onWarning('Unable to verify your details right now. Please try again in a moment.');
         return;
       }

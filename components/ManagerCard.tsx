@@ -2,7 +2,12 @@ import Image from 'next/image';
 import { type SquadOfficial, playerImageUrl } from '@/lib/teams';
 import PlayerSilhouette from './PlayerSilhouette';
 
-export default function ManagerCard({ manager, flagSrc }: { manager: SquadOfficial; flagSrc: string }) {
+interface ManagerCardProps {
+  manager: SquadOfficial;
+  flagSrc: string;
+}
+
+export default function ManagerCard({ manager, flagSrc }: Readonly<ManagerCardProps>) {
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-(--color-badge-dark)">
       <div className="relative aspect-square bg-white/5">
