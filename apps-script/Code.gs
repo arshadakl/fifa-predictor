@@ -3,6 +3,8 @@
 // See DEPLOY.md for setup instructions.
 
 var SHEET_NAME = 'Predictions';
+var CONFIG_SHEET_NAME = 'Config';
+var ACTUALS_SHEET_NAME = 'Actuals';
 
 var SHEET_HEADERS = [
   'Submission_ID',
@@ -49,6 +51,16 @@ function doPost(e) {
         return jsonOutput({ ok: true });
       case 'overwrite':
         overwriteAll(sheet, body.payload || []);
+        return jsonOutput({ ok: true });
+      case 'readConfig':
+        return jsonOutput({ ok: true, config: readKv(CONFIG_SHEET_NAME) });
+      case 'writeConfig':
+        writeKv(CONFIG_SHEET_NAME, body.payload || {});
+        return jsonOutput({ ok: true, config: readKv(CONFIG_SHEET_NAME) });
+      case 'readActuals':
+        return jsonOutput({ ok: true, actuals: readKv(ACTUALS_SHEET_NAME) });
+      case 'writeActuals':
+        writeKv(ACTUALS_SHEET_NAME, body.payload || {});
         return jsonOutput({ ok: true });
       default:
         return jsonOutput({ ok: false, error: 'Unknown action: ' + body.action });
@@ -145,6 +157,64 @@ function overwriteAll(sheet, submissions) {
   if (submissions && submissions.length > 0) {
     var rows = submissions.map(objectToRow);
     sheet.getRange(2, 1, rows.length, SHEET_HEADERS.length).setValues(rows);
+  }
+}
+
+// --- Generic key/value tabs (Config app settings + stored Actuals) ----------
+// Each is a two-column sheet: header row "Key" | "Value", then one row per
+// entry. Values are always read back as strings. writeKv merges a patch into
+// the existing rows so callers can update one field without clobbering others.
+
+function getKvSheet(sheetName) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+  }
+  var firstRow = sheet.getRange(1, 1, 1, 2).getValues()[0];
+  if (firstRow[0] !== 'Key' || firstRow[1] !== 'Value') {
+    sheet.getRange(1, 1, 1, 2).setValues([['Key', 'Value']]);
+  }
+  return sheet;
+}
+
+function readKv(sheetName) {
+  var sheet = getKvSheet(sheetName);
+  var lastRow = sheet.getLastRow();
+  var obj = {};
+  if (lastRow < 2) return obj;
+  var values = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+  values.forEach(function (row) {
+    var key = row[0];
+    if (key === '' || key === null) return;
+    var value = row[1];
+    if (value === null || value === undefined) value = '';
+    else if (Object.prototype.toString.call(value) === '[object Date]') value = value.toISOString();
+    else value = String(value);
+    obj[String(key)] = value;
+  });
+  return obj;
+}
+
+function writeKv(sheetName, patch) {
+  var sheet = getKvSheet(sheetName);
+  var current = readKv(sheetName);
+  Object.keys(patch || {}).forEach(function (key) {
+    var value = patch[key];
+    current[key] = value === undefined || value === null ? '' : String(value);
+  });
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, 2).clearContent();
+  }
+
+  var keys = Object.keys(current);
+  if (keys.length > 0) {
+    var rows = keys.map(function (key) {
+      return [key, current[key]];
+    });
+    sheet.getRange(2, 1, rows.length, 2).setValues(rows);
   }
 }
 

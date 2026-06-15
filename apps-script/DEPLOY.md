@@ -8,7 +8,14 @@ deployed Web App URL and a shared secret.
 
 Create a new Google Sheet (or use an existing one) — this will store all
 prediction submissions. You don't need to add any headers manually; the script
-creates a `Predictions` sheet/tab and header row automatically on first use.
+creates these tabs automatically on first use:
+
+- **`Predictions`** — one row per participant submission.
+- **`Config`** — app settings as `Key` / `Value` rows (registration window,
+  results publishing, closed/results messages, last-disabled timestamp). Managed
+  from the admin **Event Controls** tab; you never edit it by hand.
+- **`Actuals`** — the actual tournament results entered in the admin, stored as
+  `Key` / `Value` rows so they persist across browsers.
 
 ## 2. Open the Apps Script editor
 
@@ -59,3 +66,9 @@ If you edit `Code.gs` later, you must create a **new deployment** (or use
 **Manage deployments > Edit > New version**) for the changes to take effect —
 the Web App URL stays the same when you create a new version of an existing
 deployment.
+
+> **Upgrading an existing deployment:** the registration window, results
+> publishing, late-entry check, and stored actuals features require the updated
+> `Code.gs` (it adds the `readConfig` / `writeConfig` / `readActuals` /
+> `writeActuals` actions and the `Config` / `Actuals` tabs). Re-paste `Code.gs`
+> and deploy a **new version** — existing `Predictions` data is untouched.
