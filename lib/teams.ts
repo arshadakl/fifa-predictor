@@ -116,7 +116,7 @@ export function groupPlayersByPosition(players: SquadPlayer[]): { position: stri
 }
 
 export function playerImageUrl(url: string, width: number): string {
-  return `${url}?&io=transform:fill,aspectratio:1x1,width:${width}&quality=75`;
+  return `${url}?&io=transform:fill,aspectratio:1x1,width:${width}&quality=90`;
 }
 
 // teamMatchResult: 0 = draw, 1 = win, 2 = loss

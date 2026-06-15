@@ -52,7 +52,20 @@ function PreviewCard({ slot, value }: Readonly<PreviewCardProps>) {
         )}
       >
         {imageSrc ? (
-          <Image src={imageSrc} alt="" width={56} height={56} className="h-full w-full object-cover" unoptimized />
+          <Image
+            src={imageSrc}
+            alt=""
+            width={120}
+            height={120}
+            className={cn(
+              'h-full w-full object-cover',
+              // Player photos are head-and-shoulders with the face near the top,
+              // so zoom from the top to fill the circle with the face. Flags stay
+              // as-is.
+              slot.kind === 'player' && 'object-top scale-[3] origin-top'
+            )}
+            unoptimized
+          />
         ) : (
           <PlayerSilhouette className="h-7 w-7 text-white/40" />
         )}

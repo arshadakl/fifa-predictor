@@ -31,7 +31,7 @@ const RAW_PLAYER_OPTIONS = Object.values(squadsData).flatMap((squad) =>
     name: p.name,
     teamName: squad.teamName,
     flagSrc: flagUrl(squad.teamFlag, 4),
-    imageSrc: p.pictureUrl ? playerImageUrl(p.pictureUrl, 250) : null,
+    imageSrc: p.pictureUrl ? playerImageUrl(p.pictureUrl, 500) : null,
     position: p.position,
   })),
 );
