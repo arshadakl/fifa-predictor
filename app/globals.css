@@ -412,7 +412,7 @@ body {
   color: var(--color-text-secondary);
   border-radius: 999px;
   padding: 8px 16px;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   font-family: var(--font-heading);
   cursor: pointer;

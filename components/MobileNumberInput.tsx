@@ -31,7 +31,7 @@ export default function MobileNumberInput({
           inputMode="numeric"
           autoComplete="tel-national"
           maxLength={10}
-          placeholder="Enter your mobile number"
+          placeholder="Enter mobile number"
           value={value}
           onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 10))}
           className="flex-1 w-full px-4 py-4 bg-transparent border-none outline-none font-(family-name:--font-body) text-[1rem] text-white placeholder:text-(--color-text-secondary) placeholder:opacity-60"

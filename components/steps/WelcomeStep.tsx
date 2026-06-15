@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import StatsBar from '../StatsBar';
 
 export default function WelcomeStep() {
   return (
@@ -43,16 +42,16 @@ export default function WelcomeStep() {
               against fans from the group.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex  gap-1 mb-6">
               <Link
                 href="/prediction"
-                className="inline-flex items-center justify-center gap-2 h-[52px] min-w-[180px] px-7 font-(family-name:--font-display) font-extrabold text-sm tracking-[0.05em] uppercase whitespace-nowrap no-underline cursor-pointer transition-opacity [clip-path:polygon(6%_0,100%_0,94%_100%,0%_100%)] bg-(--color-gold-3) text-(--color-nav-dark) hover:opacity-85"
+                className="inline-flex items-center justify-center gap-2 h-[52px] min-w-[150px] px-7 font-(family-name:--font-display) font-extrabold text-sm tracking-[0.05em] uppercase whitespace-nowrap no-underline cursor-pointer transition-opacity [clip-path:polygon(6%_0,100%_0,94%_100%,0%_100%)] bg-(--color-gold-3) text-(--color-nav-dark) hover:opacity-85"
               >
                 Predict Now <span aria-hidden="true">→</span>
               </Link>
               <Link
                 href="/teams"
-                className="inline-flex items-center justify-center gap-2 h-[52px] min-w-[180px] px-7 font-(family-name:--font-display) font-extrabold text-sm tracking-[0.05em] uppercase whitespace-nowrap no-underline cursor-pointer transition-colors [clip-path:polygon(6%_0,100%_0,94%_100%,0%_100%)] bg-transparent border-[1.5px] border-white text-white hover:bg-white/[0.08]"
+                className="inline-flex items-center justify-center gap-2 h-[52px] min-w-[150px] px-7 font-(family-name:--font-display) font-extrabold text-sm tracking-[0.05em] uppercase whitespace-nowrap no-underline cursor-pointer transition-colors [clip-path:polygon(6%_0,100%_0,94%_100%,0%_100%)] bg-transparent border-[1.5px] border-white text-white hover:bg-white/[0.08]"
               >
                 View Teams &amp; Squad <span aria-hidden="true">→</span>
               </Link>
@@ -88,7 +87,6 @@ export default function WelcomeStep() {
         </div>
       </div>
 
-      <StatsBar />
     </div>
   );
 }

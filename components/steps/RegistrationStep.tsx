@@ -73,7 +73,7 @@ export default function RegistrationStep({
 
   return (
     <div className="page-enter">
-      <div className="glass-card w-full max-w-[550px] px-10 py-5">
+      <div className="glass-card w-full max-w-[550px] md:px-10 px-4 py-5">
         <div className=" mx-auto mb-5 rounded-full flex items-center justify-center ">
           <Image  src="/logo/fifa-world-cup-logo.png" alt="Registration Icon" width={94} height={94} />
         </div>
