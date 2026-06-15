@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import IconInput from '../IconInput';
 import MobileNumberInput from '../MobileNumberInput';
 import Spinner from '../Spinner';
@@ -8,6 +9,10 @@ import { UserIcon, MailIcon, ArrowRightIcon } from '../icons';
 import { btnPrimary } from '../buttonStyles';
 import Image from 'next/image';
 import { checkDuplicate } from '@/lib/api';
+
+const LoadingOverlay = dynamic(() => import('../LoadingOverlay'), { ssr: false });
+
+const VERIFY_MESSAGES = ['Verifying your details…', 'Just a moment…', 'Almost ready ⚽'];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
@@ -73,6 +78,7 @@ export default function RegistrationStep({
 
   return (
     <div className="page-enter">
+      {submitting && <LoadingOverlay messages={VERIFY_MESSAGES} />}
       <div className="glass-card w-full max-w-[550px] md:px-10 px-4 py-5">
         <div className=" mx-auto mb-5 rounded-full flex items-center justify-center ">
           <Image  src="/logo/fifa-world-cup-logo.png" alt="Registration Icon" width={94} height={94} />

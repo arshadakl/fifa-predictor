@@ -2,8 +2,13 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import OptionSelector from '../OptionSelector';
+
+// Lazy + client-only: the lottie runtime and animation JSON only load when a
+// submit is actually in flight, never on a normal page load.
+const LoadingOverlay = dynamic(() => import('../LoadingOverlay'), { ssr: false });
 import PredictionPreview from './PredictionPreview';
 import { btnPrimarySm, btnSecondarySm, btnGoldSm } from '../buttonStyles';
 import { TEAM_OPTIONS, PLAYER_OPTIONS } from '@/lib/predictionOptions';
@@ -149,6 +154,7 @@ export default function PredictionWizard({
 
   return (
     <div className="page-enter">
+      {isSubmitting && <LoadingOverlay />}
       <div className="glass-card w-full max-w-[700px] py-8 px-3 sm:p-10">
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
           <div className="flex gap-2 flex-wrap">
