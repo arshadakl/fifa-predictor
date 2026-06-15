@@ -9,12 +9,18 @@ export default function WarningModal({
 }: Readonly<WarningModalProps>) {
   if (!message) return null;
 
+  // The modal is reused for duplicate detection and for generic server/network
+  // errors, so derive the heading from the message instead of always claiming a
+  // duplicate was found.
+  const isDuplicate = /already|duplicate/i.test(message);
+  const title = isDuplicate ? 'Duplicate Submission Detected' : 'Something Went Wrong';
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-[10px] flex items-center justify-center z-100 p-5 animate-fade-in">
       <div className="glass-card max-w-[450px] w-full text-center p-9 px-6 border border-(--color-accent-gold)/25 shadow-[0_25px_50px_rgba(255,215,0,0.05)]">
         <div className="text-5xl mb-4">⚠️</div>
         <h3 className="font-(family-name:--font-heading) font-bold text-2xl mb-3 text-(--color-accent-gold)">
-          Duplicate Submission Detected
+          {title}
         </h3>
         <p className="text-(--color-text-secondary) leading-relaxed mb-7">{message}</p>
         <button

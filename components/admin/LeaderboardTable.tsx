@@ -78,13 +78,18 @@ export default function LeaderboardTable({
                 </td>
               </tr>
             ) : (
-              filtered.map((s, index) => {
+              filtered.map((s) => {
                 let rankText: string | number = s.Rank || '-';
                 if (s.Rank === 1) rankText = '🥇 1';
                 else if (s.Rank === 2) rankText = '🥈 2';
                 else if (s.Rank === 3) rankText = '🥉 3';
 
-                const rankColor = RANK_COLORS[index] ?? 'text-white';
+                // Colour by actual rank, not row position - otherwise the
+                // medal colours land on the wrong rows once the list is
+                // searched/filtered or arrives unsorted.
+                const rankNum = typeof s.Rank === 'number' ? s.Rank : Number(s.Rank);
+                const rankColor =
+                  rankNum >= 1 && rankNum <= 3 ? RANK_COLORS[rankNum - 1] : 'text-white';
 
                 return (
                   <tr
