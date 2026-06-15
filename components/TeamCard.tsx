@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const ROW_LABEL_CLASS = 'text-[11px] tracking-[0.1em] uppercase text-white/45';
-const ROW_VALUE_CLASS = 'flex items-center gap-1.5 text-[13px] font-semibold text-white';
+const ROW_VALUE_CLASS = 'flex items-center gap-1.5 text-[13px] font-semibold text-white whitespace-nowrap';
 
 interface TeamCardProps {
   team: Team;
@@ -51,12 +51,12 @@ export default function TeamCard({ team }: Readonly<TeamCardProps>) {
       </div>
 
       <div className="flex flex-col gap-2.5 p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
           <span className={ROW_LABEL_CLASS}>Stage</span>
           <span className={ROW_VALUE_CLASS}>{team.stage}</span>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
           <span className={ROW_LABEL_CLASS}>Tournament Form</span>
           <div className="flex items-center gap-1">
             {formSlots.map((result, i) => (
@@ -68,7 +68,7 @@ export default function TeamCard({ team }: Readonly<TeamCardProps>) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
           <span className={ROW_LABEL_CLASS}>Last Match</span>
           {lastMatch ? (
             <div className={ROW_VALUE_CLASS}>
@@ -90,7 +90,7 @@ export default function TeamCard({ team }: Readonly<TeamCardProps>) {
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
           <span className={ROW_LABEL_CLASS}>Next Match</span>
           {nextMatch ? (
             <div className={ROW_VALUE_CLASS}>

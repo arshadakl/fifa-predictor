@@ -5,7 +5,8 @@ import Footer from '@/components/Footer';
 import SquadGrid from '@/components/SquadGrid';
 import { fetchSquadData, fetchTeamsData, flagUrl } from '@/lib/teams';
 
-export const revalidate = 300;
+// Squad rosters rarely change — regenerate hourly (matches the fetch TTL).
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const { teams } = await fetchTeamsData();

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { btnSecondary } from '../buttonStyles';
 
 interface ThankYouStepProps {
@@ -13,12 +14,9 @@ export default function ThankYouStep({
     <div className="page-enter">
       <div className="glass-card w-full max-w-[650px] p-10 text-center flex flex-col items-center">
         <div className="flex flex-col items-center mb-6">
-          <div className="w-18 h-18 rounded-full bg-(--color-accent-blue)/10 border-2 border-(--color-accent-blue) flex justify-center items-center mb-3">
-            <svg className="w-10 h-10" viewBox="0 0 52 52" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round">
-              <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-              <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-            </svg>
-          </div>
+            <div className=" mx-auto mb-5 rounded-full flex items-center justify-center ">
+                      <Image  src="/logo/fifa-world-cup-logo.png" alt="Registration Icon" width={94} height={94} />
+                    </div>
           <span className="font-(family-name:--font-heading) font-bold text-[0.9rem] text-(--color-accent-blue) uppercase tracking-[1.5px]">
             Prediction Submitted Successfully
           </span>

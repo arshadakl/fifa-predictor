@@ -71,9 +71,10 @@ export async function fetchTeamsData(): Promise<TeamsData> {
 }
 
 export async function fetchSquadData(teamId: string): Promise<SquadData> {
+  // Squad rosters change rarely, so cache for an hour to minimise upstream hits.
   const res = await fetch(
     `https://api.fifa.com/api/v3/teams/${teamId}/squad?idCompetition=17&idSeason=285023&language=en`,
-    { next: { revalidate: 300 } },
+    { next: { revalidate: 3600 } },
   );
   if (!res.ok) throw new Error(`Failed to fetch squad: ${res.status}`);
   const data = await res.json();
