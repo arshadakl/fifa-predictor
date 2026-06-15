@@ -426,6 +426,37 @@ body {
   background: rgba(0, 191, 255, 0.12);
 }
 
+/* Football-pitch lineup for the prediction preview */
+.pitch-field {
+  position: relative;
+  background: repeating-linear-gradient(to bottom, #1e5c34 0px, #1e5c34 48px, #226339 48px, #226339 96px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pitch-field::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pitch-field::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
 /* Admin dashboard background gradient */
 .admin-body {
   background-attachment: fixed;

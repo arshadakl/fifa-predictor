@@ -1,11 +1,14 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import Spinner from '../Spinner';
+import { toast } from 'sonner';
 import OptionSelector from '../OptionSelector';
-import { btnPrimary, btnSecondary, btnGold } from '../buttonStyles';
+import PredictionPreview from './PredictionPreview';
+import { btnPrimarySm, btnSecondarySm, btnGoldSm } from '../buttonStyles';
 import { TEAM_OPTIONS, PLAYER_OPTIONS } from '@/lib/predictionOptions';
 import type { Predictions, PredictionField } from '@/lib/fields';
+import { cn } from '@/lib/utils';
+import { submitPrediction } from '@/lib/api';
 
 type WizardField = { key: PredictionField; question: string; category: 0 | 1 };
 
@@ -27,6 +30,17 @@ const CATEGORY_NAMES = ['Tournament Predictions', 'Player Awards Predictions'];
 const CATEGORY_COUNTS = [6, 5];
 const CATEGORY_START = [0, 6];
 
+interface PredictionWizardProps {
+  values: Predictions;
+  onChange: (field: PredictionField, value: string) => void;
+  questionIndex: number;
+  onQuestionIndexChange: (index: number) => void;
+  restFormData: Record<string, string>;
+  onSubmit: (submissionId: string) => void;
+  onBack: () => void;
+  onWarning: (message: string) => void;
+}
+
 export default function PredictionWizard({
   values,
   onChange,
@@ -36,19 +50,10 @@ export default function PredictionWizard({
   onSubmit,
   onBack,
   onWarning,
-}: {
-  values: Predictions;
-  onChange: (field: PredictionField, value: string) => void;
-  questionIndex: number;
-  onQuestionIndexChange: (index: number) => void;
-  restFormData: Record<string, string>;
-  onSubmit: (submissionId: string) => void;
-  onBack: () => void;
-  onWarning: (message: string) => void;
-}) {
-  const [error, setError] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const submittingRef = useRef(false);
+}: Readonly<PredictionWizardProps>) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   const field = WIZARD_FIELDS[questionIndex];
   const category = field.category;
@@ -58,12 +63,15 @@ export default function PredictionWizard({
   const overallProgress = ((questionIndex + 1) / WIZARD_FIELDS.length) * 100;
 
   function goToCategory(cat: 0 | 1) {
-    setError(false);
+    setShowPreview(false);
     onQuestionIndexChange(CATEGORY_START[cat]);
   }
 
   function handleBack() {
-    setError(false);
+    if (showPreview) {
+      setShowPreview(false);
+      return;
+    }
     if (questionIndex === 0) {
       onBack();
       return;
@@ -71,33 +79,30 @@ export default function PredictionWizard({
     onQuestionIndexChange(questionIndex - 1);
   }
 
-  async function handleNext() {
+  function handleNext() {
     if (!value.trim()) {
-      setError(true);
+      toast.error('Please select an answer before continuing.');
       return;
     }
-    setError(false);
 
     if (!isLast) {
       onQuestionIndexChange(questionIndex + 1);
       return;
     }
 
-    if (submittingRef.current) return;
-    submittingRef.current = true;
-    setSubmitting(true);
+    setShowPreview(true);
+  }
+
+  async function handleSubmit() {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
     try {
-      const response = await fetch('/api/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...restFormData, ...values }),
-      });
+      const { status, result } = await submitPrediction({ ...restFormData, ...values });
 
-      const result = await response.json();
-
-      if (response.status === 201 && result.success) {
+      if (status === 201 && result.success) {
         onSubmit(result.Submission_ID);
-      } else if (response.status === 409) {
+      } else if (status === 409) {
         onWarning(
           result.message ||
             'You have already submitted a prediction. Only one entry per participant is permitted.'
@@ -109,78 +114,67 @@ export default function PredictionWizard({
       console.error('Submission failed:', err);
       onWarning('Unable to connect to the server. Please check your connection and try again.');
     } finally {
-      submittingRef.current = false;
-      setSubmitting(false);
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
   return (
     <div className="page-enter">
       <div className="glass-card w-full max-w-[700px] p-8 sm:p-10">
-        <div className="flex gap-3 mb-6 flex-wrap">
-          {CATEGORY_NAMES.map((name, i) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => goToCategory(i as 0 | 1)}
-              className={`category-pill ${category === i ? 'active' : ''}`}
-            >
-              {i + 1}. {name}
+        <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
+          <div className="flex gap-3 flex-wrap">
+            {CATEGORY_NAMES.map((name, i) => (
+              <button
+                key={name}
+                type="button"
+                onClick={() => goToCategory(i as 0 | 1)}
+                className={cn('category-pill', category === i && 'active')}
+              >
+                {i + 1}. {name}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-3">
+            <button onClick={handleBack} disabled={isSubmitting} className={btnSecondarySm}>
+              Back
             </button>
-          ))}
-        </div>
-
-        <p className="text-(--color-text-secondary) text-[0.85rem] mb-2">
-          Question {indexInCategory + 1} of {CATEGORY_COUNTS[category]}
-        </p>
-        <div className="w-full h-1 bg-white/5 rounded-full mb-8 overflow-hidden">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-(--color-accent-blue) to-(--color-accent-gold) transition-[width] duration-400"
-            style={{ width: `${overallProgress}%` }}
-          />
-        </div>
-
-        <h2 className="font-(family-name:--font-heading) font-bold text-2xl sm:text-3xl md:text-[2.2rem] leading-snug mb-6 text-white">
-          {field.question}
-        </h2>
-
-        <OptionSelector
-          key={field.key}
-          options={category === 0 ? TEAM_OPTIONS : PLAYER_OPTIONS}
-          kind={category === 0 ? 'team' : 'player'}
-          value={value}
-          onChange={(name) => onChange(field.key, name)}
-        />
-
-        {error && (
-          <span className="error-msg-summary show block w-full bg-red-500/10 border border-red-500/25 text-red-300 px-4 py-3 rounded-[10px] text-[0.9rem] mt-4 text-center">
-            Please select an answer before continuing.
-          </span>
-        )}
-
-        <div className="flex justify-between w-full mt-10 gap-4">
-          <button onClick={handleBack} disabled={submitting} className={`${btnSecondary} flex-1`}>
-            Back
-          </button>
-          <button
-            onClick={handleNext}
-            disabled={submitting}
-            className={`${isLast ? btnGold : btnPrimary} flex-1`}
-          >
-            {submitting ? (
-              <span className="inline-flex items-center gap-2">
-                <Spinner /> Submitting...
-              </span>
-            ) : isLast ? (
-              <>
-                Submit Prediction
-                <span className="btn-shine" />
-              </>
-            ) : (
-              'Next'
+            {!showPreview && (
+              <button onClick={handleNext} className={isLast ? btnGoldSm : btnPrimarySm}>
+                {isLast ? 'Confirm and Submit' : 'Next'}
+              </button>
             )}
-          </button>
+          </div>
         </div>
+
+        {showPreview ? (
+          <PredictionPreview values={values} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+        ) : (
+          <>
+            <p className="text-(--color-text-secondary) text-[0.85rem] mb-2">
+              Question {indexInCategory + 1} of {CATEGORY_COUNTS[category]}
+            </p>
+            <div className="w-full h-1 bg-white/5 rounded-full mb-8 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-(--color-accent-blue) to-(--color-accent-gold) transition-[width] duration-400"
+                style={{ width: `${overallProgress}%` }}
+              />
+            </div>
+
+            <h2 className="font-(family-name:--font-heading) font-bold text-2xl sm:text-3xl md:text-[2.2rem] leading-snug mb-6 text-white">
+              {field.question}
+            </h2>
+
+            <OptionSelector
+              key={field.key}
+              options={category === 0 ? TEAM_OPTIONS : PLAYER_OPTIONS}
+              kind={category === 0 ? 'team' : 'player'}
+              value={value}
+              onChange={(name) => onChange(field.key, name)}
+            />
+          </>
+        )}
       </div>
     </div>
   );
