@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import OptionSelector from '../OptionSelector';
 import PredictionPreview from './PredictionPreview';
@@ -8,7 +9,7 @@ import { btnPrimarySm, btnSecondarySm, btnGoldSm } from '../buttonStyles';
 import { TEAM_OPTIONS, PLAYER_OPTIONS } from '@/lib/predictionOptions';
 import type { Predictions, PredictionField } from '@/lib/fields';
 import { cn } from '@/lib/utils';
-import { submitPrediction } from '@/lib/api';
+import { checkDuplicate, submitPrediction } from '@/lib/api';
 
 type WizardField = { key: PredictionField; question: string; category: 0 | 1 };
 
@@ -90,6 +91,16 @@ export default function PredictionWizard({
       return;
     }
 
+    // Category pills let the user jump around, so reaching the last question
+    // does not guarantee every earlier answer is filled. Block the preview and
+    // jump to the first blank one instead of submitting an incomplete entry.
+    const missing = WIZARD_FIELDS.findIndex((f) => !values[f.key].trim());
+    if (missing !== -1) {
+      toast.error('Please answer all questions before submitting.');
+      onQuestionIndexChange(missing);
+      return;
+    }
+
     setShowPreview(true);
   }
 
@@ -98,6 +109,23 @@ export default function PredictionWizard({
     isSubmittingRef.current = true;
     setIsSubmitting(true);
     try {
+      const dup = await checkDuplicate({
+        Mobile_Number: restFormData.Mobile_Number,
+        Email_Address: restFormData.Email_Address,
+      });
+
+      if (dup.status === 409) {
+        onWarning(
+          dup.result.message ||
+            'You have already submitted a prediction. Only one entry per participant is permitted.'
+        );
+        return;
+      }
+      if (!dup.ok) {
+        onWarning('Unable to verify your details right now. Please try again in a moment.');
+        return;
+      }
+
       const { status, result } = await submitPrediction({ ...restFormData, ...values });
 
       if (status === 201 && result.success) {
@@ -121,9 +149,9 @@ export default function PredictionWizard({
 
   return (
     <div className="page-enter">
-      <div className="glass-card w-full max-w-[700px] p-8 sm:p-10">
+      <div className="glass-card w-full max-w-[700px] py-8 px-3 sm:p-10">
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
             {CATEGORY_NAMES.map((name, i) => (
               <button
                 key={name}
@@ -131,7 +159,7 @@ export default function PredictionWizard({
                 onClick={() => goToCategory(i as 0 | 1)}
                 className={cn('category-pill', category === i && 'active')}
               >
-                {i + 1}. {name}
+                {name}
               </button>
             ))}
           </div>
@@ -155,10 +183,20 @@ export default function PredictionWizard({
             <p className="text-(--color-text-secondary) text-[0.85rem] mb-2">
               Question {indexInCategory + 1} of {CATEGORY_COUNTS[category]}
             </p>
-            <div className="w-full h-1 bg-white/5 rounded-full mb-8 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-(--color-accent-blue) to-(--color-accent-gold) transition-[width] duration-400"
-                style={{ width: `${overallProgress}%` }}
+            <div className="relative w-full h-1 bg-white/5 rounded-full mb-8">
+              <div className="h-full rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-(--color-accent-blue) to-(--color-accent-gold) transition-[width] duration-400"
+                  style={{ width: `${overallProgress}%` }}
+                />
+              </div>
+              <Image
+                src="/images/football.png"
+                alt=""
+                width={20}
+                height={20}
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-5 w-5 transition-[left] duration-400"
+                style={{ left: `${overallProgress}%` }}
               />
             </div>
 
