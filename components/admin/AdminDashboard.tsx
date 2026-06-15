@@ -50,7 +50,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function loadSubmissions() {
       try {
-        const { ok, result } = await fetchSubmissions();
+        const { ok, status, result } = await fetchSubmissions();
+        if (status === 401) {
+          window.location.assign('/admin/login');
+          return;
+        }
         if (ok && result.success) {
           setSubmissions(result.submissions);
         } else {
@@ -71,6 +75,16 @@ export default function AdminDashboard() {
     setTimeout(() => setToast(null), 3000);
   }
 
+  async function handleLogout() {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      window.location.assign('/admin/login');
+    }
+  }
+
   async function handleCalculate() {
     setCalculating(true);
     try {
@@ -80,7 +94,11 @@ export default function AdminDashboard() {
     }
 
     try {
-      const { ok, result } = await calculateScores(actuals);
+      const { ok, status, result } = await calculateScores(actuals);
+      if (status === 401) {
+        window.location.assign('/admin/login');
+        return;
+      }
       if (ok && result.success) {
         setSubmissions(result.submissions);
         showToast(result.message || 'Scores and rankings computed successfully!');
@@ -109,9 +127,14 @@ export default function AdminDashboard() {
               Manage predictions, calculate scores, and export results
             </p>
           </div>
-          <Link href="/" className={`${btnSecondary} text-[0.95rem] px-5 py-2.5`}>
-            ← Back to Contest Home
-          </Link>
+          <div className="flex gap-3 flex-wrap">
+            <Link href="/" className={`${btnSecondary} text-[0.95rem] px-5 py-2.5`}>
+              ← Back to Contest Home
+            </Link>
+            <button onClick={handleLogout} className={`${btnSecondary} text-[0.95rem] px-5 py-2.5`}>
+              Log out
+            </button>
+          </div>
         </header>
 
         <MetricsGrid submissions={submissions} />
