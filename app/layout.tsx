@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Outfit, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
+import { ConfigProvider } from "@/components/ConfigProvider";
+import { getPublicConfigSafe } from "@/lib/serverConfig";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,15 +29,17 @@ export const metadata: Metadata = {
   description: "Submit your predictions for FIFA World Cup 2026 and stand a chance to win exciting prizes.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const config = await getPublicConfigSafe();
+
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} ${barlowCondensed.variable} h-full`}>
       <body className="min-h-full flex flex-col">
-        {children}
+        <ConfigProvider value={config}>{children}</ConfigProvider>
         <Toaster position="top-center" richColors />
       </body>
     </html>

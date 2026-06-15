@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { readSubmissions, appendSubmission } from '@/lib/appsScript';
+import { readSubmissions, appendSubmission, readConfig } from '@/lib/appsScript';
+import { toPublicConfig } from '@/lib/config';
 import { PREDICTION_FIELDS, type Predictions, type Submission } from '@/lib/fields';
 import {
   EMAIL_REGEX,
@@ -48,7 +49,29 @@ export async function POST(request: Request) {
   }
 
   try {
-    const submissions = await readSubmissions();
+    // Enforce the registration window server-side so the gate cannot be bypassed
+    // by calling this endpoint directly after predictions have closed. Read fresh
+    // (uncached) so a close takes effect immediately with no bypass window, and in
+    // PARALLEL with the submissions read to halve the function's wall-time.
+    // Fail OPEN on the config read: if it fails (e.g. Apps Script not yet
+    // redeployed with the config actions), allow the submission rather than
+    // blocking everyone.
+    const [config, submissions] = await Promise.all([
+      readConfig()
+        .then(toPublicConfig)
+        .catch((configError) => {
+          console.error('Registration gate config read failed, allowing submission:', configError);
+          return null;
+        }),
+      readSubmissions(),
+    ]);
+
+    if (config && !config.registrationEnabled) {
+      return NextResponse.json(
+        { success: false, message: config.registrationClosedMessage },
+        { status: 403 }
+      );
+    }
 
     const duplicateField = findDuplicateField(submissions, Mobile_Number, Email_Address);
     if (duplicateField === 'mobile') {

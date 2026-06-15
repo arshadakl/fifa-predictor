@@ -1,4 +1,5 @@
-import type { Predictions, Submission } from './fields';
+import type { Predictions, Submission, PublicSubmission } from './fields';
+import type { AppConfig } from './config';
 
 type RegistrationPayload = {
   Full_Name: string;
@@ -64,5 +65,52 @@ export function calculateScores(actuals: Predictions) {
     method: 'POST',
     headers: JSON_HEADERS,
     body: JSON.stringify(actuals),
+  });
+}
+
+export type ResultsResult =
+  | { success: true; published: false; message: string }
+  | { success: true; published: true; participants: PublicSubmission[] }
+  | { success: false; message?: string };
+
+export function fetchResults() {
+  return requestJson<ResultsResult>('/api/results', { cache: 'no-store' });
+}
+
+export type ActualsResult =
+  | { success: true; actuals: Predictions }
+  | { success: false; message?: string };
+
+export function fetchActuals() {
+  return requestJson<ActualsResult>('/api/admin/actuals');
+}
+
+// Persists actuals to the sheet without re-scoring (used by the Clear action).
+export function saveActuals(actuals: Predictions) {
+  return requestJson<ActualsResult>('/api/admin/actuals', {
+    method: 'POST',
+    headers: JSON_HEADERS,
+    body: JSON.stringify(actuals),
+  });
+}
+
+export type AdminConfigResult =
+  | { success: true; config: AppConfig }
+  | { success: false; message?: string };
+
+export function fetchAdminConfig() {
+  return requestJson<AdminConfigResult>('/api/admin/config');
+}
+
+export function saveAdminConfig(patch: Partial<{
+  registrationEnabled: boolean;
+  registrationClosedMessage: string;
+  resultsPublished: boolean;
+  resultsMessage: string;
+}>) {
+  return requestJson<AdminConfigResult>('/api/admin/config', {
+    method: 'POST',
+    headers: JSON_HEADERS,
+    body: JSON.stringify(patch),
   });
 }

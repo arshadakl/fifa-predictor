@@ -1,11 +1,20 @@
-import type { Submission } from './fields';
+import type { Predictions, Submission } from './fields';
 
-type AppsScriptAction = 'read' | 'append' | 'overwrite';
+type AppsScriptAction =
+  | 'read'
+  | 'append'
+  | 'overwrite'
+  | 'readConfig'
+  | 'writeConfig'
+  | 'readActuals'
+  | 'writeActuals';
 
 type AppsScriptResponse = {
   ok: boolean;
   error?: string;
   submissions?: Submission[];
+  config?: Record<string, string>;
+  actuals?: Record<string, string>;
 };
 
 export async function callAppsScript(
@@ -52,4 +61,23 @@ export async function appendSubmission(entry: Submission): Promise<void> {
 
 export async function overwriteSubmissions(submissions: Submission[]): Promise<void> {
   await callAppsScript('overwrite', submissions);
+}
+
+export async function readConfig(): Promise<Record<string, string>> {
+  const data = await callAppsScript('readConfig');
+  return data.config ?? {};
+}
+
+export async function writeConfig(patch: Record<string, string>): Promise<Record<string, string>> {
+  const data = await callAppsScript('writeConfig', patch);
+  return data.config ?? {};
+}
+
+export async function readActuals(): Promise<Record<string, string>> {
+  const data = await callAppsScript('readActuals');
+  return data.actuals ?? {};
+}
+
+export async function writeActuals(actuals: Predictions): Promise<void> {
+  await callAppsScript('writeActuals', actuals);
 }

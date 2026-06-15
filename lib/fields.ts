@@ -42,3 +42,7 @@ export type Submission = {
 export type Predictions = {
   [K in PredictionField]: string;
 };
+
+// Results page shape: everything a participant submitted EXCEPT the personal
+// contact fields (mobile/email are never sent to the public results endpoint).
+export type PublicSubmission = Omit<Submission, 'Mobile_Number' | 'Email_Address'>;
