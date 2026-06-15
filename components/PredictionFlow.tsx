@@ -101,10 +101,19 @@ export default function PredictionFlow() {
     }
   }
 
+  // Full restart triggered from the nav Reset button: clear saved progress and
+  // any submitted/warning state so the flow returns to the registration step.
+  function handleReset() {
+    setIsSubmitted(false);
+    setSubmissionId('');
+    setWarning(null);
+    resetProgress();
+  }
+
   return (
     <>
       <BackgroundLayers activeImage={isSubmitted ? 4 : backgroundImageIndex(currentStep, questionIndex)} />
-      <Nav />
+      <Nav onReset={handleReset} />
       <Floodlights />
 
       <main className="flex-1 flex justify-center items-center w-full max-w-[1100px] mx-auto px-5 pt-24 pb-20">
