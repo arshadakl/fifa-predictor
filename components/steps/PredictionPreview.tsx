@@ -22,8 +22,6 @@ const FORMATION: PreviewSlot[][] = [
   [
     { field: 'Third_Place', label: 'Third Place', kind: 'team' },
     { field: 'Fair_Play_Award', label: 'Fair Play', kind: 'team' },
-    { field: 'Most_Entertaining_Team', label: 'Entertainer', kind: 'team' },
-    { field: 'Dark_Horse', label: 'Most entertaining and Dark horses', kind: 'team' },
   ],
   [{ field: 'Golden_Glove', label: 'Golden Glove', kind: 'player' }],
 ];

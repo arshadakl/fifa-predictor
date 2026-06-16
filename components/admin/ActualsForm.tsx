@@ -81,8 +81,6 @@ export default function ActualsForm({
           {teamField('Runner_Up', 'Runner-Up (1pt)')}
           {teamField('Third_Place', 'Third Place (1pt)')}
           {teamField('Fair_Play_Award', 'Fair Play Award (1pt)')}
-          {teamField('Most_Entertaining_Team', 'Most Entertaining (1pt)')}
-          {teamField('Dark_Horse', 'Dark Horse (1pt)')}
         </div>
 
         <h3 className="font-(family-name:--font-heading) text-[1.05rem] font-bold uppercase tracking-[1px] text-(--color-accent-blue) mt-8 mb-5 border-b border-(--color-accent-blue)/15 pb-1.5">

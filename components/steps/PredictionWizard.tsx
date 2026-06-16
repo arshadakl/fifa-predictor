@@ -23,8 +23,6 @@ const WIZARD_FIELDS: WizardField[] = [
   { key: 'Runner_Up', question: 'Which team will finish as Runner-Up?', category: 0 },
   { key: 'Third_Place', question: 'Which team will finish in Third Place?', category: 0 },
   { key: 'Fair_Play_Award', question: 'Which team will win the FIFA Fair Play Award?', category: 0 },
-  { key: 'Most_Entertaining_Team', question: 'Which team will be the Most Entertaining?', category: 0 },
-  { key: 'Dark_Horse', question: 'Which team will be the Dark Horse?', category: 0 },
   { key: 'Golden_Ball', question: 'Who will win the Golden Ball? (Best Player)', category: 1 },
   { key: 'Golden_Boot', question: 'Who will win the Golden Boot? (Top Scorer)', category: 1 },
   { key: 'Most_Assists', question: 'Who will provide the Most Assists?', category: 1 },
@@ -33,8 +31,8 @@ const WIZARD_FIELDS: WizardField[] = [
 ];
 
 const CATEGORY_NAMES = ['Tournament Predictions', 'Player Awards Predictions'];
-const CATEGORY_COUNTS = [6, 5];
-const CATEGORY_START = [0, 6];
+const CATEGORY_COUNTS = [4, 5];
+const CATEGORY_START = [0, 4];
 
 interface PredictionWizardProps {
   values: Predictions;

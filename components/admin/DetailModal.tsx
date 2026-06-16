@@ -11,8 +11,6 @@ const FIELDS: { label: string; key: keyof Predictions; points: number; kind: Fie
   { label: 'Runner-Up (1 pt)', key: 'Runner_Up', points: 1, kind: 'team' },
   { label: 'Third Place (1 pt)', key: 'Third_Place', points: 1, kind: 'team' },
   { label: 'Fair Play Award (1 pt)', key: 'Fair_Play_Award', points: 1, kind: 'team' },
-  { label: 'Most Entertaining (1 pt)', key: 'Most_Entertaining_Team', points: 1, kind: 'team' },
-  { label: 'Dark Horse (1 pt)', key: 'Dark_Horse', points: 1, kind: 'team' },
   { label: 'Golden Ball (2 pts)', key: 'Golden_Ball', points: 2, kind: 'player' },
   { label: 'Golden Boot (1 pt)', key: 'Golden_Boot', points: 1, kind: 'player' },
   { label: 'Most Assists (1 pt)', key: 'Most_Assists', points: 1, kind: 'player' },

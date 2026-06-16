@@ -3,8 +3,6 @@ export const PREDICTION_FIELDS = [
   'Runner_Up',
   'Third_Place',
   'Fair_Play_Award',
-  'Most_Entertaining_Team',
-  'Dark_Horse',
   'Golden_Ball',
   'Golden_Boot',
   'Most_Assists',

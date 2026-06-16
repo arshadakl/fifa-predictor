@@ -4,8 +4,6 @@ const SINGLE_POINT_FIELDS: (keyof Predictions)[] = [
   'Runner_Up',
   'Third_Place',
   'Fair_Play_Award',
-  'Most_Entertaining_Team',
-  'Dark_Horse',
   'Golden_Boot',
   'Most_Assists',
   'Golden_Glove',
