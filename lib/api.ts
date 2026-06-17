@@ -30,12 +30,53 @@ export type PredictResult =
   | { success: true; Submission_ID: string; message?: string }
   | { success: false; message?: string };
 
-export function submitPrediction(payload: Predictions & Partial<RegistrationPayload>) {
-  return requestJson<PredictResult>('/api/predict', {
+const SUBMIT_MAX_ATTEMPTS = 4; // 1 initial try + 3 retries
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Exponential backoff (600ms, 1.2s, ~2.4s, capped) plus random jitter so a
+// burst of clients retrying at once de-synchronises instead of hammering the
+// backend in lockstep.
+function backoffDelay(attempt: number): number {
+  return Math.min(600 * 2 ** (attempt - 1), 2500) + Math.random() * 300;
+}
+
+// Submitting is idempotent on the server (it dedups by mobile/email), so it is
+// safe to retry transient failures. We retry on network errors and on 5xx
+// (Apps Script lock timeout / "too many simultaneous invocations" during a
+// burst, or a 502/503/504 gateway error) — but NOT on 4xx (validation 400,
+// duplicate 409, registration-closed 403), which are terminal. This turns a
+// burst-induced failure into "a little slower, still succeeds".
+export async function submitPrediction(
+  payload: Predictions & Partial<RegistrationPayload>
+): Promise<ApiResponse<PredictResult>> {
+  const init: RequestInit = {
     method: 'POST',
     headers: JSON_HEADERS,
     body: JSON.stringify(payload),
-  });
+  };
+
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= SUBMIT_MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch('/api/predict', init);
+      if (response.status >= 500 && attempt < SUBMIT_MAX_ATTEMPTS) {
+        await sleep(backoffDelay(attempt));
+        continue;
+      }
+      const result = (await response.json()) as PredictResult;
+      return { status: response.status, ok: response.ok, result };
+    } catch (err) {
+      lastError = err;
+      if (attempt < SUBMIT_MAX_ATTEMPTS) {
+        await sleep(backoffDelay(attempt));
+        continue;
+      }
+      throw lastError;
+    }
+  }
+
+  // Unreachable (loop either returns or throws), but keeps the type checker happy.
+  throw lastError;
 }
 
 export type CheckDuplicateResult = { success: true; message?: string } | { success: false; message?: string };

@@ -176,25 +176,33 @@ function normEmail(value) {
 
 function submitPrediction(sheet, payload) {
   payload = payload || {};
-  var lock = LockService.getScriptLock();
-  lock.waitLock(20000);
-  try {
-    // Registration gate. Fail OPEN if the Config read errors so a config
-    // problem never blocks every submission (matches the previous route logic).
-    try {
-      var config = readKv(CONFIG_SHEET_NAME);
-      var enabledRaw = config['registration_enabled'];
-      var enabled = (enabledRaw === undefined || enabledRaw === '')
-        ? true
-        : String(enabledRaw).trim().toUpperCase() === 'TRUE';
-      if (!enabled) {
-        var closedMsg = String(config['registration_closed_message'] || '').trim();
-        return { outcome: 'closed', message: closedMsg || DEFAULT_REGISTRATION_CLOSED_MESSAGE };
-      }
-    } catch (configErr) {
-      // Treat an unreadable Config tab as "registration enabled".
-    }
 
+  // Registration gate — read OUTSIDE the lock. It plays no part in the
+  // duplicate race, so keeping it out shortens the locked critical section,
+  // which is what limits throughput under a submission burst. Fail OPEN if the
+  // Config read errors so a config problem never blocks every submission.
+  try {
+    var config = readKv(CONFIG_SHEET_NAME);
+    var enabledRaw = config['registration_enabled'];
+    var enabled = (enabledRaw === undefined || enabledRaw === '')
+      ? true
+      : String(enabledRaw).trim().toUpperCase() === 'TRUE';
+    if (!enabled) {
+      var closedMsg = String(config['registration_closed_message'] || '').trim();
+      return { outcome: 'closed', message: closedMsg || DEFAULT_REGISTRATION_CLOSED_MESSAGE };
+    }
+  } catch (configErr) {
+    // Treat an unreadable Config tab as "registration enabled".
+  }
+
+  // Only the read-then-append (the duplicate race) needs to be atomic. Wait at
+  // most 8s for the lock: under a burst, a request that cannot get in quickly
+  // fails fast and the client retries, rather than holding an Apps Script
+  // execution slot for 20s and starving everyone (consumer accounts cap
+  // simultaneous executions at ~30).
+  var lock = LockService.getScriptLock();
+  lock.waitLock(8000);
+  try {
     var mobile = normMobile(payload.Mobile_Number);
     var email = normEmail(payload.Email_Address);
 
