@@ -47,6 +47,8 @@ function doPost(e) {
       case 'append':
         appendRow(sheet, body.payload || {});
         return jsonOutput({ ok: true });
+      case 'submit':
+        return jsonOutput({ ok: true, submit: submitPrediction(sheet, body.payload || {}) });
       case 'overwrite':
         overwriteAll(sheet, body.payload || []);
         return jsonOutput({ ok: true });
@@ -145,6 +147,95 @@ function objectToRow(obj) {
 
 function appendRow(sheet, entry) {
   sheet.appendRow(objectToRow(entry));
+}
+
+// --- Atomic prediction submit -----------------------------------------------
+// Registration-gate + duplicate check + ID generation + append, all performed
+// in ONE web-app call so the Next.js route makes a single round-trip. A script
+// lock serialises submissions, so two people submitting the same mobile/email
+// at the same time cannot both pass the duplicate check (read-then-write race).
+// Mirrors lib/validation.ts (dedup + ID format) and lib/config.ts (gate keys).
+
+var PREDICTION_FIELDS = [
+  'World_Cup_Winner', 'Runner_Up', 'Third_Place', 'Fair_Play_Award',
+  'Golden_Ball', 'Golden_Boot', 'Most_Assists', 'Golden_Glove', 'Best_Young_Player'
+];
+
+var DEFAULT_REGISTRATION_CLOSED_MESSAGE =
+  'Predictions are now closed. The submission window for FIFA World Cup 2026 has ended — thank you for your interest!';
+
+function normMobile(value) {
+  if (value === null || value === undefined || value === '') return '';
+  return String(value).trim();
+}
+
+function normEmail(value) {
+  if (value === null || value === undefined || value === '') return '';
+  return String(value).trim().toLowerCase();
+}
+
+function submitPrediction(sheet, payload) {
+  payload = payload || {};
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    // Registration gate. Fail OPEN if the Config read errors so a config
+    // problem never blocks every submission (matches the previous route logic).
+    try {
+      var config = readKv(CONFIG_SHEET_NAME);
+      var enabledRaw = config['registration_enabled'];
+      var enabled = (enabledRaw === undefined || enabledRaw === '')
+        ? true
+        : String(enabledRaw).trim().toUpperCase() === 'TRUE';
+      if (!enabled) {
+        var closedMsg = String(config['registration_closed_message'] || '').trim();
+        return { outcome: 'closed', message: closedMsg || DEFAULT_REGISTRATION_CLOSED_MESSAGE };
+      }
+    } catch (configErr) {
+      // Treat an unreadable Config tab as "registration enabled".
+    }
+
+    var mobile = normMobile(payload.Mobile_Number);
+    var email = normEmail(payload.Email_Address);
+
+    // Single pass: collect existing IDs and flag duplicates. Mobile takes
+    // precedence over email, matching findDuplicateField in lib/validation.ts.
+    var rows = readAll(sheet);
+    var existingIds = {};
+    var mobileDup = false;
+    var emailDup = false;
+    for (var i = 0; i < rows.length; i++) {
+      existingIds[rows[i].Submission_ID] = true;
+      if (mobile !== '' && normMobile(rows[i].Mobile_Number) === mobile) mobileDup = true;
+      if (email !== '' && normEmail(rows[i].Email_Address) === email) emailDup = true;
+    }
+    if (mobileDup) return { outcome: 'duplicate', field: 'mobile' };
+    if (emailDup) return { outcome: 'duplicate', field: 'email' };
+
+    var submissionId;
+    do {
+      submissionId = 'FWC26-' + Math.floor(10000 + Math.random() * 90000);
+    } while (existingIds[submissionId]);
+
+    var timestamp = payload.Timestamp || new Date().toISOString();
+    var entry = {
+      Submission_ID: submissionId,
+      Timestamp: timestamp,
+      Full_Name: payload.Full_Name || '',
+      Mobile_Number: mobile,
+      Email_Address: email,
+      Total_Score: 0,
+      Rank: ''
+    };
+    for (var j = 0; j < PREDICTION_FIELDS.length; j++) {
+      entry[PREDICTION_FIELDS[j]] = payload[PREDICTION_FIELDS[j]] || '';
+    }
+
+    appendRow(sheet, entry);
+    return { outcome: 'created', submissionId: submissionId, timestamp: timestamp };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function overwriteAll(sheet, submissions) {

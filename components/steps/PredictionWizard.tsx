@@ -14,7 +14,7 @@ import { btnPrimarySm, btnSecondarySm, btnGoldSm } from '../buttonStyles';
 import { TEAM_OPTIONS, PLAYER_OPTIONS } from '@/lib/predictionOptions';
 import type { Predictions, PredictionField } from '@/lib/fields';
 import { cn } from '@/lib/utils';
-import { checkDuplicate, submitPrediction } from '@/lib/api';
+import { submitPrediction } from '@/lib/api';
 
 type WizardField = { key: PredictionField; question: string; category: 0 | 1 };
 
@@ -112,23 +112,10 @@ export default function PredictionWizard({
     isSubmittingRef.current = true;
     setIsSubmitting(true);
     try {
-      const dup = await checkDuplicate({
-        Mobile_Number: restFormData.Mobile_Number,
-        Email_Address: restFormData.Email_Address,
-      });
-
-      if (dup.status === 409) {
-        onWarning(
-          dup.result.message ||
-            'You have already submitted a prediction. Only one entry per participant is permitted.'
-        );
-        return;
-      }
-      if (!dup.ok) {
-        onWarning('Unable to verify your details right now. Please try again in a moment.');
-        return;
-      }
-
+      // No pre-flight duplicate check here: /api/predict performs the
+      // authoritative duplicate check (and returns 409) before saving, and the
+      // registration step already screened the mobile/email earlier. Skipping
+      // it removes a full Apps Script round-trip from the submit latency.
       const { status, result } = await submitPrediction({ ...restFormData, ...values });
 
       if (status === 201 && result.success) {

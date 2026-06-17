@@ -481,6 +481,74 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Pitch markings overlay (touchline, penalty boxes, goal areas, centre spot).
+   Sits behind the line-up cards, which carry z-10. */
+.pitch-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Outer touchline */
+.pitch-lines::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+}
+
+/* Centre spot */
+.pitch-lines::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.pitch-box,
+.pitch-goal {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Penalty boxes (hang off the top/bottom touchlines) */
+.pitch-box {
+  width: 56%;
+  max-width: 280px;
+  height: 16%;
+}
+.pitch-box-top {
+  top: 12px;
+  border-top: 0;
+}
+.pitch-box-bottom {
+  bottom: 12px;
+  border-bottom: 0;
+}
+
+/* Six-yard goal areas */
+.pitch-goal {
+  width: 30%;
+  max-width: 150px;
+  height: 7%;
+}
+.pitch-goal-top {
+  top: 12px;
+  border-top: 0;
+}
+.pitch-goal-bottom {
+  bottom: 12px;
+  border-bottom: 0;
+}
+
 /* Admin dashboard background gradient */
 .admin-body {
   background-attachment: fixed;

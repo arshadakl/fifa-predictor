@@ -1,15 +1,13 @@
-import { NextResponse } from 'next/server';
-import { readSubmissions, appendSubmission, readConfig } from '@/lib/appsScript';
-import { toPublicConfig } from '@/lib/config';
-import { PREDICTION_FIELDS, type Predictions, type Submission } from '@/lib/fields';
+import { NextResponse, after } from 'next/server';
+import { submitPredictionAtomic } from '@/lib/appsScript';
+import { sendPredictionEmail } from '@/lib/email';
+import { PREDICTION_FIELDS, type Predictions } from '@/lib/fields';
 import {
   EMAIL_REGEX,
   MOBILE_REGEX,
   MAX_TEXT_LENGTH,
   normalizeMobile,
   normalizeEmail,
-  findDuplicateField,
-  generateSubmissionId,
 } from '@/lib/validation';
 
 export async function POST(request: Request) {
@@ -48,67 +46,59 @@ export async function POST(request: Request) {
     predictions[field] = value.trim().slice(0, MAX_TEXT_LENGTH);
   }
 
+  const fullName = Full_Name.trim().slice(0, MAX_TEXT_LENGTH);
+  const email = normalizeEmail(Email_Address);
+  const timestamp = new Date().toISOString();
+
   try {
-    // Enforce the registration window server-side so the gate cannot be bypassed
-    // by calling this endpoint directly after predictions have closed. Read fresh
-    // (uncached) so a close takes effect immediately with no bypass window, and in
-    // PARALLEL with the submissions read to halve the function's wall-time.
-    // Fail OPEN on the config read: if it fails (e.g. Apps Script not yet
-    // redeployed with the config actions), allow the submission rather than
-    // blocking everyone.
-    const [config, submissions] = await Promise.all([
-      readConfig()
-        .then(toPublicConfig)
-        .catch((configError) => {
-          console.error('Registration gate config read failed, allowing submission:', configError);
-          return null;
-        }),
-      readSubmissions(),
-    ]);
-
-    if (config && !config.registrationEnabled) {
-      return NextResponse.json(
-        { success: false, message: config.registrationClosedMessage },
-        { status: 403 }
-      );
-    }
-
-    const duplicateField = findDuplicateField(submissions, Mobile_Number, Email_Address);
-    if (duplicateField === 'mobile') {
-      return NextResponse.json(
-        { success: false, message: 'This mobile number has already been used for a submission.' },
-        { status: 409 }
-      );
-    }
-    if (duplicateField === 'email') {
-      return NextResponse.json(
-        { success: false, message: 'This email address has already been used for a submission.' },
-        { status: 409 }
-      );
-    }
-
-    const existingIds = new Set(submissions.map((s) => s.Submission_ID));
-    const submissionId = generateSubmissionId(existingIds);
-    const timestamp = new Date().toISOString();
-
-    const newEntry: Submission = {
-      Submission_ID: submissionId,
-      Timestamp: timestamp,
-      Full_Name: Full_Name.trim().slice(0, MAX_TEXT_LENGTH),
+    // ONE atomic Apps Script call does the registration gate, duplicate check,
+    // ID generation and append under a lock. This replaces the previous
+    // read-config + read-submissions + append (two sequential round-trips),
+    // halving the submit latency and closing the read-then-write duplicate race.
+    const outcome = await submitPredictionAtomic({
+      Full_Name: fullName,
       Mobile_Number: normalizeMobile(Mobile_Number),
-      Email_Address: normalizeEmail(Email_Address),
+      Email_Address: email,
+      Timestamp: timestamp,
       ...predictions,
-      Total_Score: 0,
-      Rank: '',
-    };
+    });
 
-    await appendSubmission(newEntry);
+    if (outcome.outcome === 'closed') {
+      return NextResponse.json({ success: false, message: outcome.message }, { status: 403 });
+    }
+    if (outcome.outcome === 'duplicate') {
+      const message =
+        outcome.field === 'mobile'
+          ? 'This mobile number has already been used for a submission.'
+          : 'This email address has already been used for a submission.';
+      return NextResponse.json({ success: false, message }, { status: 409 });
+    }
+
+    // Send the confirmation email AFTER the response is sent (next/server
+    // `after`) so the SMTP handshake (~2-4s) never delays the user's success
+    // screen. The platform keeps the function alive to run this. The email is
+    // strictly optional: if AUTH_SMTP_EMAIL / AUTH_SMTP_APP_PASSWORD are not
+    // configured, sendPredictionEmail no-ops; the extra try/catch guarantees a
+    // mail failure can never surface as an unhandled rejection.
+    after(async () => {
+      try {
+        await sendPredictionEmail({
+          to: email,
+          fullName,
+          submissionId: outcome.submissionId,
+          timestamp: outcome.timestamp,
+          predictions,
+        });
+      } catch (emailError) {
+        console.error('Prediction confirmation email failed (submission already saved):', emailError);
+      }
+    });
 
     return NextResponse.json(
       {
         success: true,
-        Submission_ID: submissionId,
-        Timestamp: timestamp,
+        Submission_ID: outcome.submissionId,
+        Timestamp: outcome.timestamp,
         message: 'Prediction submitted successfully!',
       },
       { status: 201 }

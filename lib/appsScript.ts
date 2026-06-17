@@ -3,11 +3,18 @@ import type { Predictions, Submission } from './fields';
 type AppsScriptAction =
   | 'read'
   | 'append'
+  | 'submit'
   | 'overwrite'
   | 'readConfig'
   | 'writeConfig'
   | 'readActuals'
   | 'writeActuals';
+
+// Result of the atomic `submit` action (gate + dedup + ID + append in one call).
+export type SubmitOutcome =
+  | { outcome: 'created'; submissionId: string; timestamp: string }
+  | { outcome: 'duplicate'; field: 'mobile' | 'email' }
+  | { outcome: 'closed'; message: string };
 
 type AppsScriptResponse = {
   ok: boolean;
@@ -15,6 +22,7 @@ type AppsScriptResponse = {
   submissions?: Submission[];
   config?: Record<string, string>;
   actuals?: Record<string, string>;
+  submit?: SubmitOutcome;
 };
 
 export async function callAppsScript(
@@ -57,6 +65,19 @@ export async function readSubmissions(): Promise<Submission[]> {
 
 export async function appendSubmission(entry: Submission): Promise<void> {
   await callAppsScript('append', entry);
+}
+
+// Atomic submit: the Apps Script side runs the registration gate, duplicate
+// check, ID generation and append under a lock, returning the outcome. The
+// caller (predict route) maps the outcome to an HTTP status.
+export async function submitPredictionAtomic(
+  entry: Partial<Submission> & { Timestamp: string }
+): Promise<SubmitOutcome> {
+  const data = await callAppsScript('submit', entry);
+  if (!data.submit) {
+    throw new Error('Apps Script submit action returned no result.');
+  }
+  return data.submit;
 }
 
 export async function overwriteSubmissions(submissions: Submission[]): Promise<void> {

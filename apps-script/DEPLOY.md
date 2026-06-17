@@ -72,3 +72,10 @@ deployment.
 > `Code.gs` (it adds the `readConfig` / `writeConfig` / `readActuals` /
 > `writeActuals` actions and the `Config` / `Actuals` tabs). Re-paste `Code.gs`
 > and deploy a **new version** — existing `Predictions` data is untouched.
+>
+> **`submit` action (atomic prediction submit):** `POST /api/predict` now calls
+> a single `submit` action that runs the registration gate + duplicate check +
+> ID generation + append under a `LockService` lock (one round-trip instead of
+> read-then-append, and no duplicate race). You **must re-paste `Code.gs` and
+> deploy a new version** for this — until then submissions fail with
+> `Unknown action: submit`.

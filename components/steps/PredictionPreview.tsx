@@ -93,6 +93,15 @@ export function PredictionPitch({ values }: Readonly<{ values: Predictions }>) {
 
   return (
     <div className="pitch-field flex flex-col justify-between gap-6 px-3 sm:px-6 py-6 sm:py-10 min-h-[420px] sm:min-h-[480px]">
+      {/* Pitch markings: touchline, penalty boxes, goal areas, centre spot.
+          Behind the cards (which carry z-10); centre circle + halfway line are
+          drawn by .pitch-field's own ::before/::after. */}
+      <div className="pitch-lines" aria-hidden="true">
+        <span className="pitch-box pitch-box-top" />
+        <span className="pitch-goal pitch-goal-top" />
+        <span className="pitch-box pitch-box-bottom" />
+        <span className="pitch-goal pitch-goal-bottom" />
+      </div>
       {FORMATION.map((row, i) => (
         <div key={i} className="relative z-10 flex justify-center gap-3 sm:gap-6 flex-wrap">
           {row.map((slot, j) => (

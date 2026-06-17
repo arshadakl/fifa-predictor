@@ -71,7 +71,8 @@ function loadStoredProgress(): StoredProgress {
 
 function backgroundImageIndex(step: number, questionIndex: number): number {
   if (step === 1) return 1;
-  if (step === 2) return questionIndex < 6 ? 2 : 3;
+  // Tournament Predictions = questions 0-3 (image 2); Player Awards = 4-8 (image 3).
+  if (step === 2) return questionIndex < 4 ? 2 : 3;
   return 4;
 }
 
