@@ -86,7 +86,7 @@ export default function Nav({ onReset }: Readonly<NavProps>) {
           : (
             <Link
               href="/prediction"
-              className="inline-flex items-center gap-1.5 h-9 px-[22px] bg-(--color-gold-3) text-(--color-nav-dark) font-(family-name:--font-display) font-extrabold text-xs tracking-[0.1em] uppercase no-underline whitespace-nowrap transition-opacity hover:opacity-85 [clip-path:polygon(8%_0,100%_0,92%_100%,0%_100%)]"
+              className="inline-flex items-center gap-1 sm:gap-1.5 h-8 sm:h-9 px-3.5 sm:px-[22px] bg-(--color-gold-3) text-(--color-nav-dark) font-(family-name:--font-display) font-extrabold text-[11px] sm:text-xs tracking-[0.1em] uppercase no-underline whitespace-nowrap transition-opacity hover:opacity-85 [clip-path:polygon(8%_0,100%_0,92%_100%,0%_100%)]"
             >
               Predict Now <span aria-hidden="true">→</span>
             </Link>
