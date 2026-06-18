@@ -3294,7 +3294,7 @@
     "manager": {
       "idCoach": "296787",
       "name": "Herve RENARD",
-      "pictureUrl": null
+      "pictureUrl": "https://digitalhub.fifa.com/transform/013b9763-89ed-49f3-8528-45fabf936f6a/HERVE-RENARD_296787_Front"
     }
   },
   "43899": {
@@ -4294,6 +4294,13 @@
         "pictureUrl": "https://digitalhub.fifa.com/transform/f5f477fe-a519-4c69-bb68-f6f5b97c1399/MARTINEZ_Emiliano_308300"
       },
       {
+        "idPlayer": "402934",
+        "name": "Marcos SENESI",
+        "jerseyNum": 2,
+        "position": "Defender",
+        "pictureUrl": null
+      },
+      {
         "idPlayer": "308322",
         "name": "Nicolas TAGLIAFICO",
         "jerseyNum": 3,
@@ -4341,13 +4348,6 @@
         "jerseyNum": 26,
         "position": "Defender",
         "pictureUrl": "https://digitalhub.fifa.com/transform/7aef8344-2a5b-42f0-b1a0-565d5220aa76/MOLINA-Nahuel_402925"
-      },
-      {
-        "idPlayer": "402934",
-        "name": "Marcos SENESI",
-        "jerseyNum": 2,
-        "position": "Midfielder",
-        "pictureUrl": null
       },
       {
         "idPlayer": "332847",
