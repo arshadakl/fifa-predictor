@@ -79,9 +79,23 @@ function renderCard(slot: Slot, value: string): string {
   const isGoalkeeper = slot.field === 'Golden_Glove';
   const ringColor = isGoalkeeper ? GOLD : 'rgba(255,255,255,0.55)';
 
-  const circle = imageSrc
-    ? `<img src="${escapeHtml(imageSrc)}" width="${AVATAR}" height="${AVATAR}" alt="" style="display:block;width:${AVATAR}px;height:${AVATAR}px;border-radius:50%;border:2px solid ${ringColor};background:#ffffff;" />`
-    : `<div style="width:${AVATAR}px;height:${AVATAR}px;border-radius:50%;border:2px solid ${ringColor};background:rgba(255,255,255,0.12);font-size:1px;line-height:1px;">&nbsp;</div>`;
+  let circle: string;
+  if (!imageSrc) {
+    circle = `<div style="width:${AVATAR}px;height:${AVATAR}px;border-radius:50%;border:2px solid ${ringColor};background:rgba(255,255,255,0.12);font-size:1px;line-height:1px;">&nbsp;</div>`;
+  } else if (slot.kind === 'team') {
+    // Flag cards: a circular flag sitting on a WHITE ring, so the white shows
+    // around the flag. A single <img> with border-radius:50% + a thick white
+    // border is the ONLY email-reliable way to round it — Gmail honours
+    // border-radius on <img> but NOT on <table>/<td>, so the white disc has to
+    // live on the img's own border. (Outlook drops border-radius → flag in a
+    // white square, which is an acceptable degrade.)
+    const FLAG = AVATAR - 18;
+    const RING = (AVATAR - FLAG) / 2;
+    circle = `<img src="${escapeHtml(imageSrc)}" width="${FLAG}" height="${FLAG}" alt="" style="display:block;width:${FLAG}px;height:${FLAG}px;border-radius:50%;border:${RING}px solid #ffffff;background:#ffffff;" />`;
+  } else {
+    // Player photos are transparent cutouts → full circle on a white bg.
+    circle = `<img src="${escapeHtml(imageSrc)}" width="${AVATAR}" height="${AVATAR}" alt="" style="display:block;width:${AVATAR}px;height:${AVATAR}px;border-radius:50%;border:2px solid ${ringColor};background:#ffffff;" />`;
+  }
 
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="width:96px;">
