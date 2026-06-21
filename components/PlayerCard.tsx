@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { type SquadPlayer, playerImageUrl } from '@/lib/teams';
 import PlayerSilhouette from './PlayerSilhouette';
+import PlayerImage from './PlayerImage';
 
 interface PlayerCardProps {
   player: SquadPlayer;
@@ -12,13 +13,7 @@ export default function PlayerCard({ player, flagSrc }: Readonly<PlayerCardProps
     <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-(--color-badge-dark)">
       <div className="relative aspect-square bg-white/5">
         {player.pictureUrl ? (
-          <Image
-            src={playerImageUrl(player.pictureUrl, 320)}
-            alt={player.name}
-            fill
-            className="object-cover object-top"
-            unoptimized
-          />
+          <PlayerImage src={playerImageUrl(player.pictureUrl, 320)} alt={player.name} />
         ) : (
           <PlayerSilhouette className="h-full w-full p-6 text-white/15" />
         )}
