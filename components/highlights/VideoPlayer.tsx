@@ -47,6 +47,8 @@ interface VideoPlayerProps {
 export default function VideoPlayer({ videoId, poster, title }: Readonly<VideoPlayerProps>) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<{ destroy: () => void } | null>(null);
+  const usingHlsRef = useRef(false);
+  const recoverRef = useRef(0);
   const [state, setState] = useState<PlayerState>('idle');
   const [error, setError] = useState('');
 
@@ -64,6 +66,8 @@ export default function VideoPlayer({ videoId, poster, title }: Readonly<VideoPl
     // Clear any instance from a previous (failed) attempt before retrying.
     hlsRef.current?.destroy();
     hlsRef.current = null;
+    usingHlsRef.current = false;
+    recoverRef.current = 0;
     setState('loading');
     setError('');
     try {
@@ -77,10 +81,24 @@ export default function VideoPlayer({ videoId, poster, title }: Readonly<VideoPl
       } else {
         const Hls = (await import('hls.js')).default;
         if (Hls.isSupported()) {
+          usingHlsRef.current = true;
           const hls = new Hls();
-          // Surface fatal stream errors (manifest/segment/CDN) instead of a black screen.
           hls.on(Hls.Events.ERROR, (_event, data) => {
-            if (data.fatal) fail('This highlight could not be played. Please try again.');
+            if (!data.fatal) return; // hls.js handles non-fatal errors itself
+            console.error('[highlights] hls.js fatal:', data.type, data.details, data);
+            // Try the recommended recovery (twice) before giving up.
+            if (recoverRef.current < 2) {
+              recoverRef.current += 1;
+              if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                hls.startLoad();
+                return;
+              }
+              if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                hls.recoverMediaError();
+                return;
+              }
+            }
+            fail('This highlight could not be played. Please try again.');
           });
           hls.loadSource(url);
           hls.attachMedia(video);
@@ -106,8 +124,12 @@ export default function VideoPlayer({ videoId, poster, title }: Readonly<VideoPl
         playsInline
         poster={poster ?? undefined}
         onError={() => {
-          // Native-HLS (iOS) failures land here; ignore until we've actually started.
-          if (state === 'playing') fail('This highlight could not be played. Please try again.');
+          // Only the native-HLS (iOS) path: when hls.js drives playback it owns
+          // error handling via its own ERROR event, so ignore the video element here.
+          if (state === 'playing' && !usingHlsRef.current) {
+            console.error('[highlights] native video error:', videoRef.current?.error);
+            fail('This highlight could not be played. Please try again.');
+          }
         }}
         className={cn('h-full w-full', state === 'playing' ? 'block' : 'hidden')}
       >
