@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 const BASE_NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/teams', label: 'Teams' },
+  { href: '/highlights', label: 'Highlights' },
 ];
 
 const RESULTS_LINK = { href: '/results', label: 'Results' };
@@ -40,8 +41,8 @@ export default function Nav({ onReset }: Readonly<NavProps>) {
   return (
     <>
     <header className="fixed top-0 inset-x-0 z-20 bg-(--color-nav-dark) border-b border-(--color-blue-3)/20">
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 h-[60px] flex items-center justify-between gap-6">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 h-[60px] flex items-center justify-between gap-4 sm:gap-6">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           <Image
             src="/logo/fifa-world-cup-logo.png"
             alt="FIFA World Cup logo"
@@ -49,12 +50,12 @@ export default function Nav({ onReset }: Readonly<NavProps>) {
             height={76}
             className="h-12 w-12 object-contain"
           />
-          <span className="font-(family-name:--font-display) font-extrabold text-lg sm:text-xl tracking-wider text-white uppercase whitespace-nowrap">
+          <span className="font-(family-name:--font-display) font-extrabold text-sm sm:text-xl tracking-wide sm:tracking-wider text-white uppercase whitespace-nowrap">
            sports gallery <span className="text-(--color-gold-3)">26</span>
           </span>
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-8">
+        <nav className="flex items-center gap-4 sm:gap-8">
           {navLinks.map((link) => {
             const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
 
@@ -64,6 +65,7 @@ export default function Nav({ onReset }: Readonly<NavProps>) {
                 href={link.href}
                 className={cn(
                   LINK_BASE_CLASS,
+                  link.href === '/' && 'hidden sm:inline-block',
                   isActive ? 'text-white border-(--color-gold-3)' : 'text-white/55 border-transparent hover:text-white'
                 )}
               >
@@ -73,24 +75,15 @@ export default function Nav({ onReset }: Readonly<NavProps>) {
           })}
         </nav>
 
-        {isPrediction
-          ? onReset && (
-              <button
-                type="button"
-                onClick={() => setConfirmReset(true)}
-                className="inline-flex items-center gap-1.5 h-9 px-[22px] bg-transparent border border-red-400/60 text-red-300 font-(family-name:--font-display) font-extrabold text-xs tracking-[0.1em] uppercase whitespace-nowrap cursor-pointer transition-colors hover:bg-red-400/10 [clip-path:polygon(8%_0,100%_0,92%_100%,0%_100%)]"
-              >
-                <span aria-hidden="true">↺</span> Reset
-              </button>
-            )
-          : (
-            <Link
-              href="/prediction"
-              className="inline-flex items-center gap-1 sm:gap-1.5 h-8 sm:h-9 px-3.5 sm:px-[22px] bg-(--color-gold-3) text-(--color-nav-dark) font-(family-name:--font-display) font-extrabold text-[11px] sm:text-xs tracking-[0.1em] uppercase no-underline whitespace-nowrap transition-opacity hover:opacity-85 [clip-path:polygon(8%_0,100%_0,92%_100%,0%_100%)]"
-            >
-              Predict Now <span aria-hidden="true">→</span>
-            </Link>
-          )}
+        {isPrediction && onReset && (
+          <button
+            type="button"
+            onClick={() => setConfirmReset(true)}
+            className="inline-flex items-center gap-1.5 h-9 px-4 sm:px-[22px] bg-transparent border border-red-400/60 text-red-300 font-(family-name:--font-display) font-extrabold text-xs tracking-[0.1em] uppercase whitespace-nowrap cursor-pointer transition-colors hover:bg-red-400/10 [clip-path:polygon(8%_0,100%_0,92%_100%,0%_100%)]"
+          >
+            <span aria-hidden="true">↺</span> Reset
+          </button>
+        )}
       </div>
     </header>
 
