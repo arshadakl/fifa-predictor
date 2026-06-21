@@ -128,37 +128,18 @@ correct Golden Ball → earliest `Timestamp`.
 | `/teams`            | All 48 qualified teams                                       |
 | `/teams/[teamId]`   | A team's squad (players grouped by position) + manager       |
 
-### Admin (behind auth)
+A protected admin area (behind authentication) handles event controls, entering
+actual results, scoring/ranking, the leaderboard, and Excel export. Its routes
+are intentionally not documented here.
 
-| Path           | What it is                                                                  |
-| -------------- | -------------------------------------------------------------------------- |
-| `/admin/login` | Username/password sign-in                                                   |
-| `/admin`       | Dashboard: event controls, enter actuals, calculate scores, leaderboard, export |
+### Public API route handlers (`app/api/...`)
 
-### API route handlers (`app/api/...`)
-
-| Route                       | Method | Purpose                                                   |
-| --------------------------- | ------ | --------------------------------------------------------- |
-| `/api/predict`              | POST   | Atomic submit (gate + dedup + save), then async email     |
-| `/api/check-duplicate`      | POST   | Pre-submit mobile/email duplicate check                   |
-| `/api/config`               | GET    | Public config (registration/results state + messages)     |
-| `/api/results`              | GET    | Public leaderboard (cached, PII stripped)                 |
-| `/api/email-preview`        | GET    | Renders the confirmation email HTML (dev/debug)           |
-| `/api/admin/login`          | POST   | Set admin session cookie                                  |
-| `/api/admin/logout`         | POST   | Clear session                                             |
-| `/api/admin/submissions`    | GET    | All submissions (admin only)                              |
-| `/api/admin/config`         | GET/POST | Read/update event settings                              |
-| `/api/admin/actuals`        | GET    | Read stored actual results                                |
-| `/api/admin/calculate`      | POST   | Score + rank all submissions, persist actuals             |
-| `/api/admin/export`         | GET    | Download all submissions as `.xlsx`                       |
-
-### Admin auth
-
-Stateless. The session cookie (`admin_session`) holds
-`SHA-256(username:password)` — never the raw password. `proxy.ts` recomputes the
-same hash from env on every request and compares with a length-aware constant-time
-check (`lib/adminAuth.ts`). It guards `/admin/*` and `/api/admin/*`; only the
-login/logout endpoints are public. No server-side session store.
+| Route                  | Method | Purpose                                               |
+| ---------------------- | ------ | ----------------------------------------------------- |
+| `/api/predict`         | POST   | Atomic submit (gate + dedup + save), then async email |
+| `/api/check-duplicate` | POST   | Pre-submit mobile/email duplicate check               |
+| `/api/config`          | GET    | Public config (registration/results state + messages) |
+| `/api/results`         | GET    | Public leaderboard (cached, PII stripped)             |
 
 ---
 
@@ -207,21 +188,8 @@ Follow **`apps-script/DEPLOY.md`** end to end. Summary:
 
 ### 3. Configure env
 
-Copy `.env.example` to `.env.local` and fill it in:
-
-```bash
-# Apps Script backend
-APPS_SCRIPT_URL=https://script.google.com/macros/s/XXXX/exec
-APPS_SCRIPT_SECRET=<the SHARED_SECRET you set in Apps Script>
-
-# Admin sign-in
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=<a strong password>
-
-# Gmail SMTP for the confirmation email (optional — omit to disable email)
-AUTH_SMTP_EMAIL=youraccount@gmail.com
-AUTH_SMTP_APP_PASSWORD=<16-char Google App Password, needs 2FA>
-```
+Copy `.env.example` to `.env.local` and fill in the values. The required keys (and
+inline notes on each) are documented in `.env.example` — refer to that file.
 
 ### 4. Run
 
@@ -236,8 +204,8 @@ Other scripts: `pnpm build`, `pnpm start`, `pnpm lint`.
 
 ## Running the contest (admin flow)
 
-1. **Before / during:** go to `/admin`, sign in. Registration is **open** by
-   default. Use **Event Controls** to close it when the window ends (the closed
+1. **Before / during:** sign in to the admin dashboard. Registration is **open**
+   by default. Use **Event Controls** to close it when the window ends (the closed
    banner message is configurable).
 2. **After the tournament:** in the admin, enter the **actual** winners/award
    results and hit **Calculate**. This scores and ranks every submission and
