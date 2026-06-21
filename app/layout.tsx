@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Outfit, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
 import { ConfigProvider } from "@/components/ConfigProvider";
+import ConsoleSignature from "@/components/ConsoleSignature";
 import { getPublicConfigSafe } from "@/lib/serverConfig";
 import "./globals.css";
 
@@ -71,6 +72,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <ConfigProvider value={config}>{children}</ConfigProvider>
         <Toaster position="top-center" richColors />
+        <ConsoleSignature />
       </body>
     </html>
   );
