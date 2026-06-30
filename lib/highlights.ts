@@ -58,7 +58,7 @@ export async function fetchHighlightGroups(): Promise<HighlightGroup[]> {
   if (!pageRes.ok) throw new Error(`Failed to fetch highlights page: ${pageRes.status}`);
   const page: { sections?: PageSection[] } = await pageRes.json();
 
-  const carousels = (page.sections ?? []).filter((s) => s.entryType === 'sectionPromoCarousel');
+  const carousels = (page.sections ?? []).filter((s) => s.entryType === 'sectionPromoCarousel' ||"news");
   const groups = await Promise.all(carousels.map((s) => fetchCarousel(s.entryEndpoint)));
 
   return groups.filter((g): g is HighlightGroup => g !== null && g.matches.length > 0);
