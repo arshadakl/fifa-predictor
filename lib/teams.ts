@@ -1,7 +1,7 @@
 export type TeamMatchSide = {
   idTeam: string;
   abbreviation: string;
-  pictureUrl: string;
+  pictureUrl: string | undefined;
 };
 
 export type TeamMatch = {
@@ -127,7 +127,8 @@ export const FORM_RESULT_STYLES: Record<number, string> = {
   2: 'bg-red-500',
 };
 
-export function flagUrl(template: string, size: 1 | 4 = 1): string {
+export function flagUrl(template: string | null | undefined, size: 1 | 4 = 1): string {
+  if (!template) return '';
   return template.replace('{format}', 'sq').replace('{size}', String(size));
 }
 

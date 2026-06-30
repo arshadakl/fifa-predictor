@@ -76,14 +76,16 @@ export default function TeamCard({ team }: Readonly<TeamCardProps>) {
                 {getOwnScore(lastMatch, team.teamId)} - {getOpponentScore(lastMatch, team.teamId)}
               </span>
               <span className="text-white/55">{getOpponent(lastMatch, team.teamId).abbreviation}</span>
-              <Image
-                src={flagUrl(getOpponent(lastMatch, team.teamId).pictureUrl, 1)}
-                alt=""
-                width={16}
-                height={16}
-                className="h-4 w-4 rounded-full object-cover"
-                unoptimized
-              />
+              {getOpponent(lastMatch, team.teamId).pictureUrl && (
+                <Image
+                  src={flagUrl(getOpponent(lastMatch, team.teamId).pictureUrl, 1)}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="h-4 w-4 rounded-full object-cover"
+                  unoptimized
+                />
+              )}
             </div>
           ) : (
             <span className={ROW_VALUE_CLASS}>-</span>
@@ -97,14 +99,16 @@ export default function TeamCard({ team }: Readonly<TeamCardProps>) {
               <span className="text-white/55">{formatMatchDate(nextMatch.date)}</span>
               <span className="text-white/35">v</span>
               <span>{getOpponent(nextMatch, team.teamId).abbreviation}</span>
-              <Image
-                src={flagUrl(getOpponent(nextMatch, team.teamId).pictureUrl, 1)}
-                alt=""
-                width={16}
-                height={16}
-                className="h-4 w-4 rounded-full object-cover"
-                unoptimized
-              />
+              {getOpponent(nextMatch, team.teamId).pictureUrl && (
+                <Image
+                  src={flagUrl(getOpponent(nextMatch, team.teamId).pictureUrl, 1)}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="h-4 w-4 rounded-full object-cover"
+                  unoptimized
+                />
+              )}
             </div>
           ) : (
             <span className={ROW_VALUE_CLASS}>-</span>
