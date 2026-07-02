@@ -43,6 +43,7 @@ type PageSection = {
 type CarouselItem = {
   title?: string;
   description?: string;
+  publishedAt?: string;
   image?: { src?: string; alt?: string; width?: number; height?: number };
   watchDataDto?: { type?: string; videoEntryId?: string; videoDuration?: number };
 };
@@ -58,7 +59,9 @@ export async function fetchHighlightGroups(): Promise<HighlightGroup[]> {
   if (!pageRes.ok) throw new Error(`Failed to fetch highlights page: ${pageRes.status}`);
   const page: { sections?: PageSection[] } = await pageRes.json();
 
-  const carousels = (page.sections ?? []).filter((s) => s.entryType === 'sectionPromoCarousel' ||"news");
+  const carousels = (page.sections ?? []).filter(
+    (s) => s.entryType === 'sectionPromoCarousel' || s.entryType === 'news',
+  )
   const groups = await Promise.all(carousels.map((s) => fetchCarousel(s.entryEndpoint)));
 
   return groups.filter((g): g is HighlightGroup => g !== null && g.matches.length > 0);
@@ -89,7 +92,7 @@ async function fetchCarousel(entryEndpoint: string): Promise<HighlightGroup | nu
             }
           : null,
         duration: i.watchDataDto!.videoDuration ?? null,
-        matchDate: parseMatchDate(i.description ?? ''),
+        matchDate: parseMatchDate(i.description ?? '') ?? (i.publishedAt ? new Date(i.publishedAt).getTime() : null),
       }));
 
     return { id: data.entryId, title: data.title ?? '', matches };
