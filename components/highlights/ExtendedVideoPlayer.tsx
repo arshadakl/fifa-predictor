@@ -21,6 +21,9 @@ export default function ExtendedVideoPlayer({ playlist, poster, title }: Readonl
   const blobUrlRef = useRef<string | null>(null);
   const [state, setState] = useState<PlayerState>('idle');
   const [error, setError] = useState('');
+  // True while the video element is genuinely waiting on network data — separate from
+  // `state`, so the video stays visible (not swapped for the poster) while it recovers.
+  const [stalling, setStalling] = useState(false);
 
   // Tear down any hls.js instance and the blob URL when the page unmounts.
   useEffect(
@@ -30,6 +33,74 @@ export default function ExtendedVideoPlayer({ playlist, poster, title }: Readonl
     },
     [],
   );
+
+  // Surface real buffering (native `waiting`/`playing`) so a stall reads as "loading",
+  // not a frozen frame with no explanation.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const onWaiting = () => setStalling(true);
+    const onResume = () => setStalling(false);
+    video.addEventListener('waiting', onWaiting);
+    video.addEventListener('playing', onResume);
+    video.addEventListener('canplay', onResume);
+    return () => {
+      video.removeEventListener('waiting', onWaiting);
+      video.removeEventListener('playing', onResume);
+      video.removeEventListener('canplay', onResume);
+    };
+  }, []);
+
+  // Edge case: with demuxed audio (separate AUDIO group from the video rendition),
+  // hls.js/AVFoundation can independently buffer/flush each track. When the *video*
+  // track alone stalls — most often right after an ABR level switch — the audio
+  // SourceBuffer keeps feeding and playback carries on with the last video frame
+  // frozen on screen while audio keeps going. There's no `waiting` event for this
+  // (the media element isn't actually starved — audio has data), so detect it
+  // directly: if presented-frame callbacks stop firing for >1.5s while video data is
+  // buffered ahead of the current position, the video pipeline is stuck rather than
+  // network-starved — nudge `currentTime` a touch to force it to re-render.
+  useEffect(() => {
+    if (state !== 'playing') return;
+    const video = videoRef.current as (HTMLVideoElement & {
+      requestVideoFrameCallback?: (cb: () => void) => number;
+      cancelVideoFrameCallback?: (handle: number) => void;
+    }) | null;
+    if (!video || !video.requestVideoFrameCallback) return;
+
+    let lastFrameAt = performance.now();
+    let rvfcHandle: number;
+    let cancelled = false;
+
+    function onFrame() {
+      if (cancelled) return;
+      lastFrameAt = performance.now();
+      rvfcHandle = video!.requestVideoFrameCallback!(onFrame);
+    }
+    rvfcHandle = video.requestVideoFrameCallback(onFrame);
+
+    function hasBufferedAhead(v: HTMLVideoElement, lookaheadSec = 0.5) {
+      const { buffered, currentTime } = v;
+      for (let i = 0; i < buffered.length; i += 1) {
+        if (buffered.start(i) <= currentTime && buffered.end(i) > currentTime + lookaheadSec) return true;
+      }
+      return false;
+    }
+
+    const watchdog = setInterval(() => {
+      if (video.paused || video.ended) return;
+      if (performance.now() - lastFrameAt < 1500) return;
+      if (!hasBufferedAhead(video)) return; // genuinely waiting on the network — let `waiting` handle it
+      console.warn('[extended-highlights] video frame stall detected with audio still buffered; nudging playback');
+      video.currentTime = Math.max(0, video.currentTime - 0.08);
+    }, 1000);
+
+    return () => {
+      cancelled = true;
+      if (rvfcHandle != null) video.cancelVideoFrameCallback?.(rvfcHandle);
+      clearInterval(watchdog);
+    };
+  }, [state]);
 
   function fail(message: string) {
     hlsRef.current?.destroy();
@@ -45,6 +116,7 @@ export default function ExtendedVideoPlayer({ playlist, poster, title }: Readonl
     recoverRef.current = 0;
     setState('loading');
     setError('');
+    setStalling(false);
     try {
       const video = videoRef.current;
       if (!video) return;
@@ -122,6 +194,12 @@ export default function ExtendedVideoPlayer({ playlist, poster, title }: Readonl
       >
         <track kind="captions" />
       </video>
+
+      {state === 'playing' && stalling && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+        </div>
+      )}
 
       {state !== 'playing' && (
         <>
