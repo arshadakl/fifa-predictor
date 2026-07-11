@@ -1,0 +1,37 @@
+[
+  {
+    "id": "quarter-finals",
+    "title": "Quarter-finals",
+    "durationMinutes": 24,
+    "matches": [
+      {
+        "id": "0-1-6z51002746",
+        "title": "ESP Vs BEL | Extended Highlights | FIFA World Cup 2026",
+        "image": "https://akamaividz2.zee5.com/image/upload/w_753,h_423,c_scale,f_webp,q_auto:eco/resources/0-1-6z51002746/list/1920x1080listc7934112806b4573af4c672aeb94e95ff59d9879536e4e6cb94fd0d4f18ceeae.jpg",
+        "audio": {
+          "English": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/indexEnglish/English.m3u8"
+        },
+        "video": {
+          "240p": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index240p/240p.m3u8",
+          "360p": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index360p/360p.m3u8",
+          "480p": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index480p/480p.m3u8",
+          "576p": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index576p/576p.m3u8",
+          "720highp": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index720highp/720highp.m3u8",
+          "1080lowp": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index1080lowp/1080lowp.m3u8",
+          "1080highp": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/10072026/en/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026/ESP_Vs_BEL_Extended_Highlights_FIFA_World_Cup_2026_en_b91bd4ee3b081a221fb315ca8d1131f3/index1080highp/1080highp.m3u8"
+        }
+      },
+      {
+        "id": "0-1-6z51000422",
+        "title": "FRA Vs MAR | Extended Highlights | FIFA World Cup 2026",
+        "image": "https://akamaividz2.zee5.com/image/upload/w_753,h_423,c_scale,f_webp,q_auto:eco/resources/0-1-6z51000422/list/1920x1080list0f2f0ecbcac041b69a3b7a3e9eb7df1a9010f49af9ce46679c967339bb78fca6.jpg",
+        "audio": {
+          "English": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/09072026/en/FRA_Vs_MAR_Extended_Highlights_FIFA_World_Cup_2026/FRA_Vs_MAR_Extended_Highlights_FIFA_World_Cup_2026_en_bdbe42f2e2300ae06f8a0d61f8ec677a/indexEnglish/English.m3u8"
+        },
+        "video": {
+          "720p": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/09072026/en/FRA_Vs_MAR_Extended_Highlights_FIFA_World_Cup_2026/FRA_Vs_MAR_Extended_Highlights_FIFA_World_Cup_2026_en_bdbe42f2e2300ae06f8a0d61f8ec677a/index720highp/720highp.m3u8"
+        }
+      }
+    ]
+  }
+]

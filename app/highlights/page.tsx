@@ -5,12 +5,14 @@ import Footer from '@/components/Footer';
 import HighlightsGroup from '@/components/highlights/HighlightsGroup';
 import HighlightsCarousel from '@/components/highlights/HighlightsCarousel';
 import HighlightsSearch from '@/components/highlights/HighlightsSearch';
+import ExtendedHighlightsSection from '@/components/highlights/ExtendedHighlightsSection';
 import {
   type HighlightGroup,
   fetchHighlightGroups,
   getAllMatches,
   getLatestMatches,
 } from '@/lib/highlights';
+import { getExtendedHighlightGroups } from '@/lib/extendedHighlights';
 
 // Carousels change slowly; regenerate hourly. The page is CDN-cached, so all
 // visitors share ~24 builds/day rather than each triggering upstream fetches.
@@ -31,6 +33,7 @@ export default async function HighlightsPage() {
   }
   const latest = getLatestMatches(groups, 4);
   const allMatches = getAllMatches(groups);
+  const extendedGroups = getExtendedHighlightGroups();
 
   return (
     <>
@@ -42,11 +45,25 @@ export default async function HighlightsPage() {
           Match <span className="text-(--color-gold-3)">Highlights</span>
         </h1>
 
+        {latest.length > 0 && <HighlightsCarousel title="Latest Highlights" matches={latest} />}
+
+        {extendedGroups.length > 0 && (
+          <section className="mb-12">
+            {latest.length === 0 && (
+              <h2 className="font-(family-name:--font-display) mb-4 border-b border-white/10 pb-2 text-xl font-bold uppercase text-white">
+                Latest Highlights
+              </h2>
+            )}
+            {extendedGroups.map((group) => (
+              <ExtendedHighlightsSection key={group.id} group={group} />
+            ))}
+          </section>
+        )}
+
         {groups.length === 0 ? (
           <p className="text-white/60">No highlights available yet. Check back soon.</p>
         ) : (
           <>
-            {latest.length > 0 && <HighlightsCarousel title="Latest Highlights" matches={latest} />}
             <HighlightsSearch matches={allMatches} />
             {groups.map((group) => <HighlightsGroup key={group.id} group={group} />)}
           </>
