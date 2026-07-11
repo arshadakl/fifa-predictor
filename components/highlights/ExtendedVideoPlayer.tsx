@@ -11,9 +11,16 @@ interface ExtendedVideoPlayerProps {
   playlist: string;
   poster: string | null;
   title: string;
+  /** Standalone HLS-player escape hatch, offered when in-page playback can't recover. */
+  fallbackUrl: string | null;
 }
 
-export default function ExtendedVideoPlayer({ playlist, poster, title }: Readonly<ExtendedVideoPlayerProps>) {
+export default function ExtendedVideoPlayer({
+  playlist,
+  poster,
+  title,
+  fallbackUrl,
+}: Readonly<ExtendedVideoPlayerProps>) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<{ destroy: () => void } | null>(null);
   const usingHlsRef = useRef(false);
@@ -223,8 +230,18 @@ export default function ExtendedVideoPlayer({ playlist, poster, title }: Readonl
           </div>
 
           {state === 'error' && (
-            <div className="absolute inset-x-0 bottom-0 bg-red-900/85 px-4 py-2 text-center text-sm text-white">
-              {error}
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 bg-red-900/85 px-4 py-2 text-center text-sm text-white">
+              <span>{error}</span>
+              {fallbackUrl && (
+                <a
+                  href={fallbackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-(--color-gold-3) underline underline-offset-2 hover:text-white"
+                >
+                  You can watch on another safe player, click here
+                </a>
+              )}
             </div>
           )}
         </>

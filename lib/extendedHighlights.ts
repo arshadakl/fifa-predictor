@@ -89,3 +89,34 @@ export function buildMasterPlaylist(match: ExtendedHighlightMatch): string | nul
 
   return lines.join('\n');
 }
+
+// Best-first quality order for picking a single rendition (fallback player link).
+const QUALITY_ORDER = ['1080highp', '1080lowp', '720highp', '720p', '576p', '480p', '360p', '240p'];
+
+function bestVideoUrl(match: ExtendedHighlightMatch): string | null {
+  for (const quality of QUALITY_ORDER) {
+    if (match.video[quality]) return match.video[quality];
+  }
+  return Object.values(match.video)[0] ?? null;
+}
+
+function bestAudioUrl(match: ExtendedHighlightMatch): string | null {
+  return match.audio['English'] ?? Object.values(match.audio)[0] ?? null;
+}
+
+const FALLBACK_PLAYER_BASE = 'https://arshadakl.github.io/hls-stream-player/';
+
+/**
+ * Link to the standalone HLS player (a separate project) as an escape hatch for when
+ * the in-page player can't recover — it takes raw video/audio .m3u8 URLs as query
+ * params and muxes them itself, so no local playlist synthesis is needed here.
+ */
+export function buildFallbackPlayerUrl(match: ExtendedHighlightMatch): string | null {
+  const video = bestVideoUrl(match);
+  if (!video) return null;
+  const audio = bestAudioUrl(match);
+
+  const params = new URLSearchParams({ video });
+  if (audio) params.set('audio', audio);
+  return `${FALLBACK_PLAYER_BASE}?${params.toString()}`;
+}

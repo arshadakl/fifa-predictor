@@ -5,7 +5,12 @@ import Nav from '@/components/Nav';
 import Floodlights from '@/components/Floodlights';
 import Footer from '@/components/Footer';
 import ExtendedVideoPlayer from '@/components/highlights/ExtendedVideoPlayer';
-import { buildMasterPlaylist, getExtendedHighlightGroups, getExtendedHighlightMatch } from '@/lib/extendedHighlights';
+import {
+  buildFallbackPlayerUrl,
+  buildMasterPlaylist,
+  getExtendedHighlightGroups,
+  getExtendedHighlightMatch,
+} from '@/lib/extendedHighlights';
 
 export function generateStaticParams() {
   return getExtendedHighlightGroups().flatMap((g) => g.matches.map((m) => ({ id: m.id })));
@@ -36,6 +41,7 @@ export default async function ExtendedHighlightPage({
 
   const playlist = buildMasterPlaylist(match);
   if (!playlist) notFound();
+  const fallbackUrl = buildFallbackPlayerUrl(match);
 
   return (
     <>
@@ -50,7 +56,12 @@ export default async function ExtendedHighlightPage({
           <span aria-hidden="true">←</span> All Highlights
         </Link>
 
-        <ExtendedVideoPlayer playlist={playlist} poster={match.image} title={match.title} />
+        <ExtendedVideoPlayer
+          playlist={playlist}
+          poster={match.image}
+          title={match.title}
+          fallbackUrl={fallbackUrl}
+        />
 
         <div className="mt-6">
           <h1 className="font-(family-name:--font-display) text-xl sm:text-2xl font-extrabold uppercase leading-tight text-white">
