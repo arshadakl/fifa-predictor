@@ -7,8 +7,10 @@ import { cn } from '@/lib/utils';
 type PlayerState = 'idle' | 'loading' | 'playing' | 'error';
 
 interface ExtendedVideoPlayerProps {
-  /** Synthesized HLS multivariant playlist text (video renditions + AUDIO group). */
-  playlist: string;
+  /** Same-origin URL serving the synthesized HLS multivariant playlist (see the
+   *  playlist.m3u8 route handler) — a real network resource, not a blob URL, because
+   *  iOS/Safari's native HLS engine is unreliable loading manifests from `blob:`. */
+  src: string;
   poster: string | null;
   title: string;
   /** Standalone HLS-player escape hatch, offered when in-page playback can't recover. */
@@ -16,7 +18,7 @@ interface ExtendedVideoPlayerProps {
 }
 
 export default function ExtendedVideoPlayer({
-  playlist,
+  src,
   poster,
   title,
   fallbackUrl,
@@ -25,21 +27,14 @@ export default function ExtendedVideoPlayer({
   const hlsRef = useRef<{ destroy: () => void } | null>(null);
   const usingHlsRef = useRef(false);
   const recoverRef = useRef(0);
-  const blobUrlRef = useRef<string | null>(null);
   const [state, setState] = useState<PlayerState>('idle');
   const [error, setError] = useState('');
   // True while the video element is genuinely waiting on network data — separate from
   // `state`, so the video stays visible (not swapped for the poster) while it recovers.
   const [stalling, setStalling] = useState(false);
 
-  // Tear down any hls.js instance and the blob URL when the page unmounts.
-  useEffect(
-    () => () => {
-      hlsRef.current?.destroy();
-      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-    },
-    [],
-  );
+  // Tear down any hls.js instance when the page unmounts.
+  useEffect(() => () => hlsRef.current?.destroy(), []);
 
   // Surface real buffering (native `waiting`/`playing`) so a stall reads as "loading",
   // not a frozen frame with no explanation.
@@ -128,15 +123,10 @@ export default function ExtendedVideoPlayer({
       const video = videoRef.current;
       if (!video) return;
 
-      // A fresh blob per attempt — the previous one (if any) is now unreferenced.
-      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-      const blobUrl = URL.createObjectURL(new Blob([playlist], { type: 'application/vnd.apple.mpegurl' }));
-      blobUrlRef.current = blobUrl;
-
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari / iOS parse multivariant playlists (incl. alternate-audio groups)
         // and do ABR natively — no hls.js needed.
-        video.src = blobUrl;
+        video.src = src;
       } else {
         const Hls = (await import('hls.js')).default;
         if (Hls.isSupported()) {
@@ -166,11 +156,11 @@ export default function ExtendedVideoPlayer({
             }
             fail('This highlight could not be played. Please try again.');
           });
-          hls.loadSource(blobUrl);
+          hls.loadSource(src);
           hls.attachMedia(video);
           hlsRef.current = hls;
         } else {
-          video.src = blobUrl;
+          video.src = src;
         }
       }
 

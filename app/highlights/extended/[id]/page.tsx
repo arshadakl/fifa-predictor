@@ -39,8 +39,12 @@ export default async function ExtendedHighlightPage({
   if (!found) notFound();
   const { match, group } = found;
 
-  const playlist = buildMasterPlaylist(match);
-  if (!playlist) notFound();
+  // buildMasterPlaylist is the source of truth for "does this match have a playable
+  // rendition" — the actual playlist text is served by the playlist.m3u8 route so the
+  // player gets a real same-origin URL (Safari's native HLS engine won't reliably
+  // load a manifest from a blob: URL).
+  if (!buildMasterPlaylist(match)) notFound();
+  const playlistUrl = `/highlights/extended/${match.id}/playlist.m3u8`;
   const fallbackUrl = buildFallbackPlayerUrl(match);
 
   return (
@@ -57,7 +61,7 @@ export default async function ExtendedHighlightPage({
         </Link>
 
         <ExtendedVideoPlayer
-          playlist={playlist}
+          src={playlistUrl}
           poster={match.image}
           title={match.title}
           fallbackUrl={fallbackUrl}
