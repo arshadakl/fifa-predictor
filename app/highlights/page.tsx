@@ -33,7 +33,7 @@ export default async function HighlightsPage() {
   }
   const latest = getLatestMatches(groups, 4);
   const allMatches = getAllMatches(groups);
-  const extendedGroups = getExtendedHighlightGroups();
+  const extendedGroups = await getExtendedHighlightGroups();
 
   return (
     <>

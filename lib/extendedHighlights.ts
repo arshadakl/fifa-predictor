@@ -1,5 +1,3 @@
-import rawGroups from '@/data/extendedHighlights.json';
-
 export type ExtendedHighlightMatch = {
   id: string;
   title: string;
@@ -15,15 +13,28 @@ export type ExtendedHighlightGroup = {
   matches: ExtendedHighlightMatch[];
 };
 
-const groups = rawGroups as unknown as ExtendedHighlightGroup[];
+/**
+ * Data used to live in a checked-in JSON file; it's now fetched from an object
+ * storage bucket so it can be updated without a redeploy. Cached for an hour —
+ * matches this project's convention in lib/highlights.ts for slow-changing data.
+ */
+export async function getExtendedHighlightGroups(): Promise<ExtendedHighlightGroup[]> {
+  const url = process.env.EXTENDED_HIGHLIGHTS_API_URL;
+  if (!url) return [];
 
-export function getExtendedHighlightGroups(): ExtendedHighlightGroup[] {
-  return groups;
+  try {
+    const res = await fetch(url, { next: { revalidate: 3600 } });
+    if (!res.ok) return [];
+    return (await res.json()) as ExtendedHighlightGroup[];
+  } catch {
+    return [];
+  }
 }
 
-export function getExtendedHighlightMatch(
+export async function getExtendedHighlightMatch(
   id: string,
-): { match: ExtendedHighlightMatch; group: ExtendedHighlightGroup } | null {
+): Promise<{ match: ExtendedHighlightMatch; group: ExtendedHighlightGroup } | null> {
+  const groups = await getExtendedHighlightGroups();
   for (const group of groups) {
     const match = group.matches.find((m) => m.id === id);
     if (match) return { match, group };

@@ -12,8 +12,9 @@ import {
   getExtendedHighlightMatch,
 } from '@/lib/extendedHighlights';
 
-export function generateStaticParams() {
-  return getExtendedHighlightGroups().flatMap((g) => g.matches.map((m) => ({ id: m.id })));
+export async function generateStaticParams() {
+  const groups = await getExtendedHighlightGroups();
+  return groups.flatMap((g) => g.matches.map((m) => ({ id: m.id })));
 }
 
 export async function generateMetadata({
@@ -22,7 +23,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const found = getExtendedHighlightMatch(id);
+  const found = await getExtendedHighlightMatch(id);
   return {
     title: found?.match.title ?? 'Highlights',
     description: found ? `${found.group.title} extended highlights from the FIFA World Cup 2026.` : undefined,
@@ -35,7 +36,7 @@ export default async function ExtendedHighlightPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const found = getExtendedHighlightMatch(id);
+  const found = await getExtendedHighlightMatch(id);
   if (!found) notFound();
   const { match, group } = found;
 

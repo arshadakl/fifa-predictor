@@ -6,8 +6,8 @@ import ExtendedHighlightsSection from '@/components/highlights/ExtendedHighlight
 import ScrollToHighlightsOnce from '@/components/highlights/ScrollToHighlightsOnce';
 import { getExtendedHighlightGroups } from '@/lib/extendedHighlights';
 
-export default function Home() {
-  const extendedGroups = getExtendedHighlightGroups();
+export default async function Home() {
+  const extendedGroups = await getExtendedHighlightGroups();
 
   return (
     <>

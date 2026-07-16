@@ -12,7 +12,7 @@ import { buildMasterPlaylist, getExtendedHighlightMatch } from '@/lib/extendedHi
  */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const found = getExtendedHighlightMatch(id);
+  const found = await getExtendedHighlightMatch(id);
   if (!found) return new Response('Not found', { status: 404 });
 
   const playlist = buildMasterPlaylist(found.match);
