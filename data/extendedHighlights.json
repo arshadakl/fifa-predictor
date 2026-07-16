@@ -1,5 +1,35 @@
 [
   {
+    "id": "semi-finals",
+    "title": "Semi-finals",
+    "durationMinutes": 24,
+    "matches": [
+      {
+        "id": "eng-vs-arg-extended-highlights",
+        "title": "Argentina vs England Extended Highlights",
+        "image": "https://i.ytimg.com/vi/y-4saPWrPt0/hq720.jpg",
+        "audio": {
+          "English": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/16072026/en/ENG_vs_ARG_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026/ENG_vs_ARG_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026_en_a91733c9da5ad67f65b11df68c30ed2c/indexEnglish/English.m3u8"
+        },
+        "video": {
+          "720highp": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/16072026/en/ENG_vs_ARG_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026/ENG_vs_ARG_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026_en_a91733c9da5ad67f65b11df68c30ed2c/index720highp/720highp.m3u8",
+          "1080highp": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/16072026/en/ENG_vs_ARG_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026/ENG_vs_ARG_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026_en_a91733c9da5ad67f65b11df68c30ed2c/index1080highp/1080highp.m3u8"
+        }
+      },
+      {
+        "id": "esp-vs-fra-extended-highlights",
+        "title": "Spain vs France World Cup 2026 Extended Highlights",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmttPgGBh5OxL_EAy3S5bKdUiR587qo7peuI4H57AM3dG6SyoAJnwAWWnY&s=10",
+        "audio": {
+          "English": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/15072026/en/FRA_Vs_ESP_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026/FRA_Vs_ESP_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026_en_eccb094e60bbfd0224f6fadb26543f65/indexEnglish/English.m3u8"
+        },
+        "video": {
+          "1080lowp": "https://iris-vod.zee5.com/in-house/highlights/hls/inhousetranscoder/SPORTS_VOD/FIFA_2026/TOCH/long_clips/15072026/en/FRA_Vs_ESP_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026/FRA_Vs_ESP_Extended_Highlights_Semi_Final_FIFA_World_Cup_2026_en_eccb094e60bbfd0224f6fadb26543f65/index1080lowp/1080lowp.m3u8"
+        }
+      }
+    ]
+  },
+  {
     "id": "quarter-finals",
     "title": "Quarter-finals",
     "durationMinutes": 24,
