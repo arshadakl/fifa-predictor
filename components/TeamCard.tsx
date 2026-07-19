@@ -20,8 +20,10 @@ interface TeamCardProps {
 
 export default function TeamCard({ team }: Readonly<TeamCardProps>) {
   const { teamEnrichmentData: colors } = team;
+  // The API omits teamTournamentForm for teams that haven't played yet.
+  const form = team.teamTournamentForm ?? [];
   const formSlots = Array.from({ length: 5 }, (_, i) => {
-    const result = team.teamTournamentForm[team.teamTournamentForm.length - 5 + i];
+    const result = form[form.length - 5 + i];
     return result ? result.teamMatchResult : undefined;
   });
 

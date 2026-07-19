@@ -15,15 +15,15 @@ export type ExtendedHighlightGroup = {
 
 /**
  * Data used to live in a checked-in JSON file; it's now fetched from an object
- * storage bucket so it can be updated without a redeploy. Cached for an hour —
- * matches this project's convention in lib/highlights.ts for slow-changing data.
+ * storage bucket so it can be updated without a redeploy. Cached for 10 minutes
+ * so newly published matches show up quickly without hitting the bucket per-request.
  */
 export async function getExtendedHighlightGroups(): Promise<ExtendedHighlightGroup[]> {
   const url = process.env.EXTENDED_HIGHLIGHTS_API_URL;
   if (!url) return [];
 
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url, { next: { revalidate: 600 } });
     if (!res.ok) return [];
     return (await res.json()) as ExtendedHighlightGroup[];
   } catch {

@@ -21,7 +21,8 @@ export type Team = {
   teamFlag: string;
   confederationId: string;
   stage: string;
-  teamTournamentForm: { teamMatchResult: number }[];
+  // Omitted by the API for teams with no completed matches.
+  teamTournamentForm?: { teamMatchResult: number }[];
   lastMatch?: TeamMatch;
   nextMatch?: TeamMatch;
   hostTeam: boolean;

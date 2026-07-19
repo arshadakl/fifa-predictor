@@ -3,14 +3,16 @@ import Nav from '@/components/Nav';
 import Floodlights from '@/components/Floodlights';
 import Footer from '@/components/Footer';
 import SquadGrid from '@/components/SquadGrid';
-import { fetchSquadData, fetchTeamsData, flagUrl } from '@/lib/teams';
+import { fetchSquadData, flagUrl } from '@/lib/teams';
 
 // Squad rosters rarely change — regenerate hourly (matches the fetch TTL).
 export const revalidate = 3600;
 
+// Squad pages are generated on first request (then cached via ISR) instead of at
+// build time — prerendering all ~48 squads makes the build fail whenever
+// api.fifa.com is slow or unreachable from the build machine.
 export async function generateStaticParams() {
-  const { teams } = await fetchTeamsData();
-  return teams.map((team) => ({ teamId: team.teamId }));
+  return [];
 }
 
 export default async function SquadPage({ params }: { params: Promise<{ teamId: string }> }) {
