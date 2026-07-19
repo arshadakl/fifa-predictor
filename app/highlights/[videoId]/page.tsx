@@ -5,7 +5,12 @@ import Nav from '@/components/Nav';
 import Floodlights from '@/components/Floodlights';
 import Footer from '@/components/Footer';
 import VideoPlayer from '@/components/highlights/VideoPlayer';
-import { fetchHighlightGroups, fetchHighlightVideo, formatDuration } from '@/lib/highlights';
+import {
+  fetchHighlightGroups,
+  fetchHighlightVideo,
+  formatDuration,
+  highlightThumb,
+} from '@/lib/highlights';
 
 // Poster / title / description are stable, so refresh daily. The playback token is
 // minted fresh client-side at play time — the stale token cached here is never used.
@@ -28,9 +33,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { videoId } = await params;
   const video = await fetchHighlightVideo(videoId);
+  const title = video?.title ?? 'Highlights';
+  const description = video?.description ?? 'Match highlights from the FIFA World Cup 2026.';
+  // Resize via the FIFA CDN — the raw poster can be a multi-MB original, which
+  // WhatsApp's crawler silently rejects (~600KB limit) and then shows no image.
+  const image = video?.poster ? highlightThumb(video.poster, 1200) : '/images/meta-image.png';
   return {
-    title: video?.title ?? 'Highlights',
-    description: video?.description ?? 'Match highlights from the FIFA World Cup 2026.',
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'video.other',
+      images: [{ url: image, width: 1200, height: 675, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
   };
 }
 

@@ -24,9 +24,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const found = await getExtendedHighlightMatch(id);
+  const title = found?.match.title ?? 'Highlights';
+  const description = found
+    ? `${found.group.title} extended highlights from the FIFA World Cup 2026.`
+    : undefined;
+  const image = found?.match.image ?? '/images/meta-image.png';
   return {
-    title: found?.match.title ?? 'Highlights',
-    description: found ? `${found.group.title} extended highlights from the FIFA World Cup 2026.` : undefined,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'video.other',
+      images: [{ url: image, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
   };
 }
 
