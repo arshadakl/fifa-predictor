@@ -105,11 +105,9 @@ Defined in `lib/scoring.ts`. There are 9 prediction fields. Points:
 
 | Prediction                                                   | Points |
 | ------------------------------------------------------------ | ------ |
-| `World_Cup_Winner`                                           | 2      |
-| `Golden_Ball`                                                | 2      |
-| `Runner_Up`, `Third_Place`, `Fair_Play_Award`, `Golden_Boot`,`Most_Assists`, `Golden_Glove`, `Best_Young_Player` | 1 each |
+| `World_Cup_Winner`, `Golden_Ball`, `Runner_Up`, `Third_Place`, `Fair_Play_Award`, `Golden_Boot`,`Most_Assists`, `Golden_Glove`, `Best_Young_Player` | 1 each |
 
-Maximum score is **11**. Matching is case-insensitive and trim-insensitive.
+Maximum score is **9**. Matching is case-insensitive and trim-insensitive.
 
 **Tiebreakers** (in order): `Total_Score` DESC → correct World Cup Winner →
 correct Golden Ball → earliest `Timestamp`.

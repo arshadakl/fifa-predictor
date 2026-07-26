@@ -77,7 +77,7 @@ export default function ActualsForm({
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {teamField('World_Cup_Winner', 'World Cup Winner (2pts)')}
+          {teamField('World_Cup_Winner', 'World Cup Winner (1pt)')}
           {teamField('Runner_Up', 'Runner-Up (1pt)')}
           {teamField('Third_Place', 'Third Place (1pt)')}
           {teamField('Fair_Play_Award', 'Fair Play Award (1pt)')}
@@ -88,7 +88,7 @@ export default function ActualsForm({
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {playerField('Golden_Ball', 'Golden Ball Best Player (2pts)')}
+          {playerField('Golden_Ball', 'Golden Ball Best Player (1pt)')}
           {playerField('Golden_Boot', 'Golden Boot Top Scorer (1pt)')}
           {playerField('Most_Assists', 'Most Assists (1pt)')}
           {playerField('Golden_Glove', 'Golden Glove Goalkeeper (1pt)')}
@@ -99,6 +99,14 @@ export default function ActualsForm({
           <button onClick={onCalculate} disabled={calculating || clearing} className={`${btnGold} flex-1 py-4`}>
             Calculate &amp; Rank Submissions
             <span className="btn-shine" />
+          </button>
+          <button
+            type="button"
+            onClick={onCalculate}
+            disabled={calculating || clearing}
+            className={`${btnSecondary} py-4 sm:w-auto w-full`}
+          >
+            {calculating ? 'Recalculating...' : 'Recalculate Scores'}
           </button>
           <button
             type="button"

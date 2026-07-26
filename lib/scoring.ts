@@ -1,9 +1,11 @@
 import type { Submission, Predictions } from './fields';
 
 const SINGLE_POINT_FIELDS: (keyof Predictions)[] = [
+  'World_Cup_Winner',
   'Runner_Up',
   'Third_Place',
   'Fair_Play_Award',
+  'Golden_Ball',
   'Golden_Boot',
   'Most_Assists',
   'Golden_Glove',
@@ -27,10 +29,7 @@ export function calculateScoresAndRankings(
     let score = 0;
 
     const wcCorrect = matches(s.World_Cup_Winner, actuals.World_Cup_Winner);
-    if (wcCorrect) score += 2;
-
     const gbCorrect = matches(s.Golden_Ball, actuals.Golden_Ball);
-    if (gbCorrect) score += 2;
 
     SINGLE_POINT_FIELDS.forEach((field) => {
       if (matches(s[field], actuals[field])) score += 1;

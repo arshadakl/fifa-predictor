@@ -7,11 +7,11 @@ import { formatTimestamp } from '@/lib/utils';
 type FieldKind = 'team' | 'player';
 
 const FIELDS: { label: string; key: keyof Predictions; points: number; kind: FieldKind }[] = [
-  { label: 'World Cup Winner (2 pts)', key: 'World_Cup_Winner', points: 2, kind: 'team' },
+  { label: 'World Cup Winner (1 pt)', key: 'World_Cup_Winner', points: 1, kind: 'team' },
   { label: 'Runner-Up (1 pt)', key: 'Runner_Up', points: 1, kind: 'team' },
   { label: 'Third Place (1 pt)', key: 'Third_Place', points: 1, kind: 'team' },
   { label: 'Fair Play Award (1 pt)', key: 'Fair_Play_Award', points: 1, kind: 'team' },
-  { label: 'Golden Ball (2 pts)', key: 'Golden_Ball', points: 2, kind: 'player' },
+  { label: 'Golden Ball (1 pt)', key: 'Golden_Ball', points: 1, kind: 'player' },
   { label: 'Golden Boot (1 pt)', key: 'Golden_Boot', points: 1, kind: 'player' },
   { label: 'Most Assists (1 pt)', key: 'Most_Assists', points: 1, kind: 'player' },
   { label: 'Golden Glove (1 pt)', key: 'Golden_Glove', points: 1, kind: 'player' },
